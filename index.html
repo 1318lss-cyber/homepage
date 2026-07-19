@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<title>두드림모터스 | 광주 중고차 안심거래</title>
+<style>
+  :root {
+    --yellow: #175243;
+    --yellow-lite: #5cbd92;
+    --yellow-deep: #0f3d31;
+    --yellow-soft: #eaf1ed;
+    --dark: #17181c;
+    --dark-2: #232529;
+    --ink: #26282e;
+    --sub: #8a8f99;
+    --line: #eaebef;
+    --surface: #f6f7f9;
+    --red: #e5484d;
+    --blue: #4c7df0;
+    --r-lg: 18px;
+    --r-md: 12px;
+    --sh-sm: 0 1px 2px rgba(23,24,28,.05), 0 4px 12px rgba(23,24,28,.05);
+    --sh-md: 0 4px 10px rgba(23,24,28,.06), 0 16px 36px rgba(23,24,28,.10);
+    --sh-lg: 0 8px 20px rgba(23,24,28,.10), 0 28px 60px rgba(23,24,28,.16);
+    --ease: cubic-bezier(.22,.68,.34,1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+    background: #fff; color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+  }
+  ::selection { background: var(--yellow); color: #fff; }
+  button { font-family: inherit; cursor: pointer; transition: all .18s var(--ease); }
+  input, select, textarea { font-family: inherit; font-size: 14px; transition: border-color .18s, box-shadow .18s; }
+  a { text-decoration: none; color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- 최상단 유틸바 ---------- */
+  .utilbar { background: var(--dark); color: #9599a3; font-size: 12px; letter-spacing: 0; }
+  .utilbar .wrap { display: flex; justify-content: space-between; padding-top: 8px; padding-bottom: 8px; }
+  .utilbar b { color: var(--yellow-lite); font-weight: 700; }
+
+  /* ---------- GNB ---------- */
+  .gnb {
+    background: rgba(255,255,255,.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 30;
+  }
+  .gnb .wrap { display: flex; align-items: center; gap: 22px; height: 66px; }
+  .logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+  .logo .mark {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    color: #fff; font-weight: 900; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 8px rgba(15,61,49,.35);
+  }
+  .logo .txt { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; }
+  .logo .txt span { color: var(--yellow-deep); }
+  nav.menus { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
+  nav.menus::-webkit-scrollbar { display: none; }
+  nav.menus button {
+    border: none; background: none; font-size: 14.5px; font-weight: 600; color: #55585f;
+    padding: 9px 13px; border-radius: 10px; white-space: nowrap;
+  }
+  nav.menus button:hover { background: var(--surface); color: var(--ink); }
+  nav.menus button.hot { color: var(--yellow-deep); font-weight: 800; }
+  .gnb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .gnb-tel { font-size: 13.5px; font-weight: 800; text-align: right; line-height: 1.3; letter-spacing: 0; }
+  .gnb-tel small { display: block; font-weight: 500; color: var(--sub); font-size: 10.5px; margin-top: 1px; }
+  .admin-btn {
+    border: 1px solid var(--line); background: #fff; color: var(--sub);
+    font-size: 12px; font-weight: 600; padding: 8px 13px; border-radius: 10px;
+  }
+  .admin-btn:hover { border-color: #d5d7dd; color: var(--ink); }
+  .admin-btn.on { background: var(--dark); border-color: var(--dark); color: var(--yellow-lite); font-weight: 700; }
+
+  /* ---------- 히어로 캐러셀 ---------- */
+  .hero { position: relative; overflow: hidden; background: var(--dark); }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background:
+      radial-gradient(520px 300px at 82% -10%, rgba(92,189,146,.16), transparent 65%),
+      radial-gradient(420px 280px at 8% 110%, rgba(76,125,240,.10), transparent 60%);
+  }
+  .hero-track { display: flex; transition: transform .6s var(--ease); }
+  .slide { min-width: 100%; padding: 64px 20px 78px; color: #fff; text-align: center; position: relative; }
+  .slide .eyebrow {
+    display: inline-block; background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    font-size: 11.5px; font-weight: 700; letter-spacing: .14em;
+    padding: 7px 16px; border-radius: 22px; margin-bottom: 18px; color: #d8dae0;
+  }
+  .slide h2 { font-size: 34px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.32; }
+  .slide h2 em { font-style: normal; color: var(--yellow-lite); }
+  .slide p { margin-top: 13px; font-size: 15px; color: #a3a7b1; font-weight: 400; }
+  .slide .cta {
+    display: inline-block; margin-top: 26px;
+    background: var(--yellow); color: #fff;
+    font-size: 14.5px; font-weight: 800; padding: 14px 32px; border-radius: 28px;
+    border: none; box-shadow: 0 8px 24px rgba(92,189,146,.32);
+  }
+  .slide .cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(92,189,146,.42); }
+  .slide.s2 { background: linear-gradient(150deg, #1a1a17, #0e1a15); }
+  .slide.s3 { background: linear-gradient(150deg, #14181f, #1d2129); }
+  .hero-dots { position: absolute; bottom: 22px; left: 0; right: 0; display: flex; justify-content: center; gap: 7px; z-index: 2; }
+  .hero-dots button { width: 7px; height: 7px; border-radius: 50%; border: none; background: rgba(255,255,255,.28); padding: 0; }
+  .hero-dots button.cur { background: var(--yellow); width: 24px; border-radius: 5px; }
+  .hero-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06); color: #fff; font-size: 17px;
+    backdrop-filter: blur(4px);
+  }
+  .hero-arrow:hover { background: rgba(255,255,255,.16); }
+  .hero-arrow.l { left: 14px; } .hero-arrow.r { right: 14px; }
+
+  /* ---------- 모델 검색 박스 ---------- */
+  .searchcard {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+    margin-top: -38px; position: relative; z-index: 5;
+    padding: 24px;
+  }
+  .searchcard .sc-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+  .searchcard h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+  .searchcard .total { font-size: 13px; color: var(--sub); }
+  .searchcard .total b { color: var(--yellow-deep); font-size: 16px; font-weight: 800; }
+  .sc-tabs {
+    display: flex; gap: 4px; margin-top: 16px;
+    background: var(--surface); border-radius: 12px; padding: 4px;
+  }
+  .sc-tabs button {
+    flex: 1; border: none; background: transparent;
+    font-size: 13.5px; font-weight: 700; color: var(--sub); padding: 10px 0;
+    border-radius: 9px;
+  }
+  .sc-tabs button.cur { background: #fff; color: var(--ink); box-shadow: var(--sh-sm); }
+  .sc-panel { padding: 16px 2px 2px; }
+  .cascade-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cascade-row select {
+    flex: 1; min-width: 130px;
+    border: 1.5px solid var(--line); border-radius: var(--r-md);
+    padding: 13px 12px; font-size: 14px; font-weight: 600;
+    background: var(--surface); color: var(--ink);
+  }
+  .cascade-row select:focus { outline: none; border-color: var(--yellow-deep); background: #fff; box-shadow: 0 0 0 4px rgba(92,189,146,.16); }
+  .cascade-row select:disabled { color: #b4b8c0; background: #f0f1f4; cursor: not-allowed; }
+  .cascade-row .go {
+    border: none; background: var(--dark); color: var(--yellow-lite);
+    font-weight: 800; font-size: 14px; padding: 0 30px; border-radius: var(--r-md);
+    min-width: 96px;
+  }
+  .cascade-row .go:hover { background: var(--dark-2); }
+  .kw-row { display: flex; gap: 8px; }
+  .kw-row input {
+    flex: 1; border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 13px 16px; font-size: 15px;
+    background: var(--surface);
+  }
+  .kw-row input:focus { outline: none; border-color: var(--yellow-deep); background: #fff; box-shadow: 0 0 0 4px rgba(92,189,146,.18); }
+  .kw-row button {
+    border: none; background: var(--dark); color: var(--yellow-lite);
+    font-weight: 800; font-size: 14px; padding: 0 26px; border-radius: var(--r-md);
+  }
+  .kw-row button:hover { background: var(--dark-2); }
+  .themes { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+  .themes .t-label { font-size: 12px; font-weight: 800; color: var(--sub); align-self: center; margin-right: 4px; letter-spacing: .02em; }
+  .themes button {
+    border: 1px solid var(--line); background: #fff; color: #55585f;
+    font-size: 12.5px; font-weight: 600; padding: 8px 14px; border-radius: 20px;
+  }
+  .themes button:hover { border-color: #d5d7dd; color: var(--ink); }
+  .themes button.cur {
+    background: var(--dark); border-color: var(--dark); color: var(--yellow-lite); font-weight: 700;
+  }
+
+  /* ---------- 섹션 공통 ---------- */
+  section.blk { padding: 44px 0 6px; }
+  .blk-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .blk-head h3 {
+    font-size: 21px; font-weight: 800; letter-spacing: -0.03em;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .blk-head h3::before {
+    content: ""; width: 5px; height: 19px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--yellow), var(--yellow-deep));
+  }
+  .blk-head h3 em { font-style: normal; color: var(--yellow-deep); }
+  .blk-head .more { font-size: 13px; color: var(--sub); border: none; background: none; }
+  .blk-head .more:hover { color: var(--ink); }
+  .blk-head select {
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
+    font-size: 13px; background: #fff; color: var(--ink); font-weight: 600;
+  }
+
+  /* ---------- 매물 그리드 ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(238px, 1fr)); gap: 18px; }
+  .card {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+    overflow: hidden; cursor: pointer; position: relative;
+    transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--sh-md); border-color: transparent; }
+  .thumb {
+    aspect-ratio: 4 / 2.7; background: linear-gradient(160deg, #eef0f3, #e5e8ec);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    color: #a9adb6; font-size: 12.5px; overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s var(--ease); }
+  .card:hover .thumb img { transform: scale(1.045); }
+  .thumb .photo-num {
+    position: absolute; left: 9px; bottom: 9px;
+    background: rgba(23,24,28,.65); backdrop-filter: blur(3px);
+    color: #fff; font-size: 10.5px; font-weight: 700;
+    padding: 4px 9px; border-radius: 8px; letter-spacing: 0;
+  }
+  .fav {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.94); font-size: 15px; color: #c9ccd3;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--sh-sm);
+  }
+  .fav:hover { transform: scale(1.12); }
+  .fav.on { color: var(--red); }
+  .sold-overlay {
+    position: absolute; inset: 0; background: rgba(23,24,28,.66); backdrop-filter: blur(1.5px);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 17px; font-weight: 800; letter-spacing: .35em; text-indent: .35em;
+  }
+  .badges { display: flex; gap: 4px; position: absolute; top: 10px; left: 10px; }
+  .bdg { font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 7px; letter-spacing: .01em; }
+  .bdg.diag { background: var(--yellow); color: #fff; }
+  .bdg.noacc { background: var(--blue); color: #fff; }
+  .bdg.new { background: var(--red); color: #fff; }
+  .card-body { padding: 14px 15px 16px; }
+  .card-body .name { font-size: 14.5px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.42; }
+  .card-body .specs { margin-top: 6px; font-size: 12px; color: var(--sub); letter-spacing: 0; }
+  .card-body .specs span:not(:last-child)::after { content: " · "; color: #d0d3d9; }
+  .card-body .price { margin-top: 11px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+  .card-body .price small { font-size: 12px; font-weight: 600; color: var(--sub); margin-left: 2px; }
+  .admin-actions { display: flex; gap: 5px; padding: 0 13px 13px; }
+  .admin-actions button {
+    flex: 1; font-size: 11.5px; font-weight: 700; padding: 8px 0; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .admin-actions button:hover { background: var(--line); }
+  .admin-actions .del { color: var(--red); }
+  .admin-actions .sold-toggle { color: var(--blue); }
+  .empty {
+    grid-column: 1 / -1; text-align: center; padding: 72px 20px; color: var(--sub);
+    background: var(--surface); border: 1.5px dashed #dfe1e6; border-radius: var(--r-lg); font-size: 13.5px;
+  }
+  .empty b { display: block; font-size: 16px; color: var(--ink); margin-bottom: 7px; font-weight: 700; }
+
+  /* ---------- 인기순위 ---------- */
+  .rank-list { background: var(--surface); border-radius: var(--r-lg); padding: 20px 22px; }
+  .rank-list ol { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px 26px; }
+  .rank-list li {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 4px; border-bottom: 1px solid #ebedf0; font-size: 13.5px; cursor: pointer;
+    border-radius: 8px; transition: background .15s;
+  }
+  .rank-list li:hover { background: #eff1f4; }
+  .rank-list li .no {
+    width: 23px; height: 23px; border-radius: 7px; flex-shrink: 0;
+    background: #dfe2e7; color: #6d727c; font-size: 11.5px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rank-list li:nth-child(-n+3) .no { background: var(--dark); color: var(--yellow-lite); }
+  .rank-list li b { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rank-list li span { color: var(--sub); font-size: 11.5px; letter-spacing: 0; }
+
+  /* ---------- 내차팔기 배너 ---------- */
+  .sell-banner {
+    background: linear-gradient(115deg, var(--yellow) 0%, #1d6350 60%, #2a7a5f 100%);
+    border-radius: var(--r-lg); padding: 30px 30px;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    position: relative; overflow: hidden;
+  }
+  .sell-banner::after {
+    content: ""; position: absolute; right: -50px; top: -70px;
+    width: 230px; height: 230px; border-radius: 50%;
+    background: rgba(255,255,255,.22);
+  }
+  .sell-banner h4 { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+  .sell-banner p { font-size: 13.5px; color: #cfe6da; margin-top: 6px; font-weight: 500; }
+  .sell-banner button {
+    border: none; background: var(--dark); color: var(--yellow-lite);
+    font-size: 14.5px; font-weight: 800; padding: 15px 28px; border-radius: 14px;
+    position: relative; z-index: 1; box-shadow: 0 8px 20px rgba(23,24,28,.22);
+  }
+  .sell-banner button:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(23,24,28,.28); }
+
+  /* ---------- 이용후기 ---------- */
+  .reviews { display: grid; grid-template-columns: repeat(auto-fill, minmax(242px, 1fr)); gap: 14px; }
+  .review {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 18px; position: relative; cursor: pointer;
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .review:hover { transform: translateY(-3px); box-shadow: var(--sh-sm); }
+  .review .stars { color: var(--yellow-deep); font-size: 12.5px; letter-spacing: 2.5px; }
+  .review .r-car { font-size: 13.5px; font-weight: 800; margin-top: 9px; letter-spacing: -0.02em; }
+  .review .r-txt {
+    font-size: 12.5px; color: var(--sub); line-height: 1.65; margin-top: 6px;
+    white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .review .r-by { font-size: 11px; color: #b4b8c0; margin-top: 12px; letter-spacing: 0; }
+  .review .r-del {
+    position: absolute; top: 12px; right: 12px;
+    border: none; background: var(--surface); color: var(--red);
+    font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px; display: none;
+  }
+  body.admin .review .r-del { display: block; }
+  .review-write {
+    border: none; background: var(--dark); color: var(--yellow-lite);
+    font-size: 13px; font-weight: 800; padding: 10px 18px; border-radius: 22px;
+    box-shadow: var(--sh-sm);
+  }
+  .review-write:hover { transform: translateY(-1px); box-shadow: var(--sh-md); }
+  .star-pick { display: flex; gap: 5px; }
+  .star-pick button { border: none; background: none; font-size: 28px; color: #dfe1e6; padding: 0 2px; }
+  .star-pick button.on { color: var(--yellow-deep); }
+  .star-pick button:hover { transform: scale(1.15); }
+  .reviews .empty-r {
+    grid-column: 1 / -1; text-align: center; padding: 44px 16px; color: var(--sub);
+    background: var(--surface); border-radius: var(--r-lg); font-size: 13.5px;
+  }
+  .more-btn {
+    width: 100%; margin-top: 14px;
+    border: 1px solid var(--line); background: #fff; color: #55585f;
+    font-size: 13.5px; font-weight: 700; padding: 13px 0; border-radius: var(--r-md);
+  }
+  .more-btn:hover { background: var(--surface); color: var(--ink); }
+  .v-review { border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px; margin-bottom: 10px; position: relative; }
+  .v-review .r-txt-full { font-size: 13.5px; color: #45484f; line-height: 1.75; margin-top: 9px; white-space: pre-wrap; }
+  .v-notice { border-bottom: 1px solid var(--line); padding: 15px 2px; }
+  .v-notice b { font-size: 14px; font-weight: 700; display: block; white-space: pre-wrap; line-height: 1.65; }
+  .v-notice time { font-size: 12px; color: var(--sub); display: block; margin-top: 6px; }
+
+  /* ---------- 공지사항 ---------- */
+  .notice-list { border-top: 2px solid var(--dark); }
+  .notice-list .n-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 15px 6px; border-bottom: 1px solid var(--line); font-size: 13.5px; cursor: pointer;
+    transition: background .15s;
+  }
+  .notice-list .n-row:hover { background: var(--surface); }
+  .notice-list .n-row b {
+    font-weight: 600; flex: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .notice-list .n-row b::before {
+    content: "공지"; color: var(--yellow-deep); font-weight: 800; font-size: 11px;
+    margin-right: 9px; background: var(--yellow-soft); padding: 3px 8px; border-radius: 6px;
+  }
+  .notice-list .n-row time { color: var(--sub); font-size: 12px; flex-shrink: 0; letter-spacing: 0; }
+  .notice-list .n-del { border: none; background: none; color: var(--red); font-size: 12px; font-weight: 600; }
+  .notice-add { display: none; gap: 8px; margin-top: 12px; }
+  body.admin .notice-add { display: flex; }
+  .notice-add input {
+    flex: 1; border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 11px 14px; background: var(--surface);
+  }
+  .notice-add input:focus { outline: none; border-color: var(--yellow-deep); background: #fff; }
+  .notice-add button {
+    border: none; background: var(--dark); color: var(--yellow-lite);
+    font-weight: 700; border-radius: var(--r-md); padding: 0 20px; font-size: 13px;
+  }
+
+  /* ---------- 푸터 ---------- */
+  footer { background: var(--dark); color: #858993; margin-top: 52px; padding: 44px 0 56px; }
+  .f-grid { display: grid; grid-template-columns: 1fr; gap: 26px; }
+  @media (min-width: 720px) { .f-grid { grid-template-columns: 1.2fr 1fr; } }
+  .f-cs h5 { font-size: 14px; font-weight: 700; color: #b7bac2; letter-spacing: -0.01em; }
+  .f-cs .tel { font-size: 30px; font-weight: 800; color: var(--yellow-lite); margin-top: 10px; letter-spacing: -0.02em; }
+  .f-cs p { font-size: 12.5px; color: #85899a; line-height: 1.8; margin-top: 10px; }
+  .f-info { font-size: 12px; color: #6e7280; line-height: 2; }
+  .f-info b { color: #d8dae0; font-size: 13px; }
+
+  /* ---------- FAB / 모달 / 폼 ---------- */
+  .fab {
+    position: fixed; right: 22px; bottom: 22px; z-index: 40;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    color: #fff; border: none;
+    font-size: 14.5px; font-weight: 800; padding: 16px 24px; border-radius: 32px;
+    box-shadow: 0 10px 28px rgba(15,61,49,.42); display: none;
+  }
+  .fab:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(15,61,49,.5); }
+  body.admin .fab { display: block; }
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(23,24,28,.52);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    display: none; align-items: flex-end; justify-content: center; z-index: 50;
+  }
+  .modal-bg.open { display: flex; animation: fadeIn .2s var(--ease); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(28px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+  .modal {
+    background: #fff; width: 100%; max-width: 530px;
+    border-radius: 22px 22px 0 0; max-height: 92vh; overflow-y: auto;
+    padding: 26px 22px 34px;
+    animation: slideUp .28s var(--ease);
+    box-shadow: var(--sh-lg);
+  }
+  @media (min-width: 640px) {
+    .modal-bg { align-items: center; padding: 20px; }
+    .modal { border-radius: 22px; }
+  }
+  .modal h4 { font-size: 18px; font-weight: 800; margin-bottom: 18px; letter-spacing: -0.02em; }
+  .modal .close-x {
+    float: right; border: none; background: var(--surface); border-radius: 50%;
+    width: 34px; height: 34px; font-size: 14px; color: var(--sub);
+  }
+  .modal .close-x:hover { background: var(--line); color: var(--ink); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .fld label { display: block; font-size: 12px; font-weight: 700; color: var(--sub); margin-bottom: 6px; letter-spacing: .01em; }
+  .fld input, .fld select, .fld textarea {
+    width: 100%; border: 1.5px solid var(--line); border-radius: var(--r-md);
+    padding: 12px 13px; font-size: 14px; background: var(--surface);
+  }
+  .fld input:focus, .fld select:focus, .fld textarea:focus {
+    outline: none; border-color: var(--yellow-deep); background: #fff;
+    box-shadow: 0 0 0 4px rgba(92,189,146,.16);
+  }
+  .fld textarea { height: 84px; resize: none; line-height: 1.55; }
+  .check-row { display: flex; gap: 16px; align-items: center; padding-top: 6px; }
+  .check-row label { display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: var(--ink); margin: 0; }
+  .check-row input { accent-color: var(--yellow-deep); width: 16px; height: 16px; }
+  .photo-drop {
+    border: 1.5px dashed #d8dae0; border-radius: var(--r-md);
+    padding: 16px; text-align: center; font-size: 13px; color: var(--sub);
+    cursor: pointer; background: var(--surface); transition: border-color .18s, background .18s;
+  }
+  .photo-drop:hover { border-color: var(--yellow-deep); background: var(--yellow-soft); }
+  .photo-count { font-size: 12px; font-weight: 800; color: var(--yellow-deep); margin-top: 6px; display: block; }
+  .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 9px; }
+  .photo-grid .ph { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 4/3; background: #eceef2; }
+  .photo-grid .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-grid .ph .rm {
+    position: absolute; top: 4px; right: 4px; width: 21px; height: 21px;
+    border: none; border-radius: 50%; background: rgba(23,24,28,.72);
+    color: #fff; font-size: 10px; line-height: 21px; padding: 0;
+  }
+  .photo-grid .ph .main-badge {
+    position: absolute; left: 0; bottom: 0; right: 0;
+    background: rgba(15,61,49,.94); color: #fff; font-size: 10px; font-weight: 800;
+    text-align: center; padding: 2.5px 0;
+  }
+  .modal .submit {
+    width: 100%; margin-top: 18px;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    border: none; color: #fff;
+    font-size: 15.5px; font-weight: 800; padding: 16px; border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(15,61,49,.28);
+  }
+  .modal .submit:hover { box-shadow: 0 10px 22px rgba(15,61,49,.36); }
+  .modal .submit:active { transform: translateY(1px); }
+
+  /* ---------- 상세 모달 ---------- */
+  .detail-photo {
+    height: 264px; border-radius: var(--r-lg); overflow: hidden; background: var(--dark);
+    display: flex; align-items: center; justify-content: center; color: #85899a; position: relative;
+  }
+  .detail-photo img { width: 100%; height: 100%; object-fit: contain; }
+  .gal-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%;
+    background: rgba(255,255,255,.1); color: #fff; font-size: 16px;
+    backdrop-filter: blur(4px);
+  }
+  .gal-nav:hover { background: rgba(255,255,255,.22); }
+  .gal-nav.prev { left: 10px; } .gal-nav.next { right: 10px; }
+  .gal-idx {
+    position: absolute; right: 12px; bottom: 12px;
+    background: rgba(23,24,28,.72); color: #fff; font-size: 11px; font-weight: 700;
+    padding: 4px 11px; border-radius: 11px; letter-spacing: .02em;
+  }
+  .gal-strip { display: flex; gap: 7px; overflow-x: auto; margin-top: 9px; padding-bottom: 4px; }
+  .gal-strip::-webkit-scrollbar { display: none; }
+  .gal-strip img {
+    width: 64px; height: 48px; object-fit: cover; border-radius: 9px;
+    flex-shrink: 0; cursor: pointer; border: 2px solid transparent; opacity: .55;
+    transition: opacity .15s, border-color .15s;
+  }
+  .gal-strip img.cur { border-color: var(--yellow-lite); opacity: 1; }
+  .gal-strip img:hover { opacity: .85; }
+  .detail-name { font-size: 20px; font-weight: 800; margin-top: 16px; letter-spacing: -0.03em; }
+  .detail-badges { display: flex; gap: 5px; margin-top: 9px; }
+  .detail-price { font-size: 27px; font-weight: 800; margin-top: 9px; letter-spacing: -0.03em; }
+  .detail-price small { font-size: 13px; color: var(--sub); font-weight: 600; }
+  .spec-table { margin-top: 18px; border-top: 2px solid var(--dark); }
+  .spec-table .row {
+    display: flex; justify-content: space-between; padding: 12px 3px;
+    border-bottom: 1px solid var(--line); font-size: 13.5px;
+  }
+  .spec-table .row span:first-child { color: var(--sub); }
+  .spec-table .row span:last-child { font-weight: 700; letter-spacing: 0; }
+  .detail-desc { margin-top: 16px; font-size: 13.5px; line-height: 1.75; color: #45484f; white-space: pre-wrap; }
+  .detail-call {
+    display: block; text-align: center; margin-top: 20px;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-deep));
+    color: #fff;
+    font-size: 15px; font-weight: 800; padding: 16px; border-radius: 14px;
+    box-shadow: 0 6px 16px rgba(15,61,49,.26);
+    transition: box-shadow .18s var(--ease), transform .18s var(--ease);
+  }
+  .detail-call:hover { box-shadow: 0 10px 22px rgba(15,61,49,.34); transform: translateY(-1px); }
+  .detail-sms {
+    display: block; text-align: center; margin-top: 9px;
+    background: var(--dark); color: #fff;
+    font-size: 13.5px; font-weight: 700; padding: 14px; border-radius: 14px;
+    transition: background .18s;
+  }
+  .detail-sms:hover { background: var(--dark-2); }
+  .toast {
+    position: fixed; left: 50%; bottom: 94px; transform: translateX(-50%) translateY(6px);
+    background: rgba(23,24,28,.94); backdrop-filter: blur(6px);
+    color: #fff; font-size: 13px; font-weight: 600;
+    padding: 12px 22px; border-radius: 26px; z-index: 60;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s var(--ease), transform .25s var(--ease);
+    box-shadow: var(--sh-md);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- 유틸바 -->
+<div class="utilbar">
+  <div class="wrap">
+    <span>광주광역시 중고차 매매단지 · <b>허위매물 ZERO</b></span>
+    <span>상담 <b>이성신 부장</b> 010-4943-9727</span>
+  </div>
+</div>
+
+<!-- GNB -->
+<div class="gnb">
+  <div class="wrap">
+    <a class="logo" href="#" onclick="scrollTop_();return false;">
+      <div class="mark">D</div>
+      <div class="txt">두드림<span>모터스</span></div>
+    </a>
+    <nav class="menus">
+      <button onclick="goSection('carsBlk')">내차사기</button>
+      <button class="hot" onclick="openModal('sellModal')">내차팔기</button>
+      <button onclick="openSise()">시세문의</button>
+      <button onclick="goSection('reviewBlk')">이용후기</button>
+      <button onclick="goSection('noticeBlk')">안내</button>
+    </nav>
+    <div class="gnb-right">
+      <div class="gnb-tel">010-4943-9727<small>평일 09~19시 · 주말 상담가능</small></div>
+      <button class="admin-btn" id="adminToggle">관리자</button>
+    </div>
+  </div>
+</div>
+
+<!-- 히어로 캐러셀 -->
+<div class="hero" id="hero">
+  <div class="hero-track" id="heroTrack">
+    <div class="slide s1">
+      <span class="eyebrow">DODREAM MOTORS · GWANGJU</span>
+      <h2>두드림모터스가<br><em>좋은 차</em>만 골라 보여드립니다</h2>
+      <p>모든 차량 성능·상태점검기록부 제공 · 이성신 부장이 직접 확인한 실매물</p>
+      <button class="cta" onclick="goSection('carsBlk')">매물 보러가기</button>
+    </div>
+    <div class="slide s2">
+      <span class="eyebrow">내차팔기</span>
+      <h2>내 차, 지금 <em>최고가</em>로<br>판매해보세요</h2>
+      <p>광주 전 지역 무료 출장 감정 · 당일 현금 매입 · 이전 절차 대행</p>
+      <button class="cta" onclick="openModal('sellModal')">매입 신청하기</button>
+    </div>
+    <div class="slide s3">
+      <span class="eyebrow">안심거래</span>
+      <h2>믿을 수 있는 품질,<br><em>성능점검 완료</em> 차량</h2>
+      <p>무사고 여부와 점검 이력을 투명하게 공개합니다</p>
+      <button class="cta" onclick="filterTheme('성능점검')">성능점검 차량 보기</button>
+    </div>
+  </div>
+  <button class="hero-arrow l" onclick="heroMove(-1)">‹</button>
+  <button class="hero-arrow r" onclick="heroMove(1)">›</button>
+  <div class="hero-dots" id="heroDots"></div>
+</div>
+
+<div class="wrap">
+  <!-- 모델 검색 -->
+  <div class="searchcard">
+    <div class="sc-head">
+      <h3>모델 검색</h3>
+      <span class="total">전체등록 매물 <b id="totalNum">0</b>대</span>
+    </div>
+    <div class="sc-tabs">
+      <button class="cur" id="tabMaker" onclick="switchTab('maker')">제조사</button>
+      <button id="tabKw" onclick="switchTab('kw')">직접 검색</button>
+    </div>
+    <div class="sc-panel">
+      <div id="panelMaker">
+        <div class="cascade-row">
+          <select id="selMaker"><option value="">제조사 전체</option></select>
+          <select id="selModel" disabled><option value="">모델 전체</option></select>
+          <select id="selSub" disabled><option value="">세부모델 전체</option></select>
+          <button class="go" onclick="applyCascade()">검색</button>
+        </div>
+      </div>
+      <div id="panelKw" class="kw-row" style="display:none">
+        <input type="text" id="searchInput" placeholder="차량명 입력 (예: 그랜저, 쏘렌토)">
+        <button onclick="applyKw()">검색</button>
+      </div>
+    </div>
+    <div class="themes" id="themes">
+      <span class="t-label">추천테마</span>
+      <button data-th="성능점검">#성능점검</button>
+      <button data-th="무사고">#무사고</button>
+      <button data-th="SUV">#SUV</button>
+      <button data-th="경차">#경차</button>
+      <button data-th="1000이하">#1,000만원 이하</button>
+      <button data-th="하이브리드전기">#하이브리드·전기</button>
+    </div>
+  </div>
+
+  <!-- 매물 -->
+  <section class="blk" id="carsBlk">
+    <div class="blk-head">
+      <h3>판매 매물 <em id="countNum">0</em>대</h3>
+      <select id="sortSel">
+        <option value="new">최신 등록순</option>
+        <option value="low">낮은 가격순</option>
+        <option value="high">높은 가격순</option>
+        <option value="km">주행거리 짧은순</option>
+        <option value="pop">인기순</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- 인기순위 -->
+  <section class="blk">
+    <div class="blk-head"><h3>인기순위</h3><button class="more" onclick="document.getElementById('sortSel').value='pop';render();goSection('carsBlk')">전체보기</button></div>
+    <div class="rank-list"><ol id="rankList"></ol></div>
+  </section>
+
+  <!-- 내차팔기 -->
+  <section class="blk">
+    <div class="sell-banner">
+      <div>
+        <h4>쉽고 빠른 내차팔기</h4>
+        <p>차량 정보만 남기시면 이성신 부장이 최고가로 감정해드립니다</p>
+      </div>
+      <button onclick="openModal('sellModal')">무료 감정 신청</button>
+    </div>
+  </section>
+
+  <!-- 이용후기 -->
+  <section class="blk" id="reviewBlk">
+    <div class="blk-head">
+      <h3>이용후기 <em id="reviewNum">0</em></h3>
+      <button class="review-write" onclick="openReviewForm()">✏️ 후기 작성</button>
+    </div>
+    <div class="reviews" id="reviews"></div>
+    <div id="reviewMore"></div>
+  </section>
+
+  <!-- 공지사항 -->
+  <section class="blk" id="noticeBlk">
+    <div class="blk-head"><h3>공지사항</h3></div>
+    <div class="notice-list" id="noticeList"></div>
+    <div id="noticeMore"></div>
+    <div class="notice-add">
+      <input type="text" id="noticeInput" placeholder="새 공지 내용 입력">
+      <button onclick="addNotice()">등록</button>
+    </div>
+  </section>
+</div>
+
+<!-- 푸터 -->
+<footer>
+  <div class="wrap f-grid">
+    <div class="f-cs">
+      <h5>고객센터 · 무엇이든 물어보세요</h5>
+      <div class="tel">010-4943-9727</div>
+      <p>상담가능시간 : 평일 09:00~19:00 · 주말/공휴일 전화 상담 가능<br>담당 : 이성신 부장 (매입 · 판매 · 시세 · 이전등록)</p>
+    </div>
+    <div class="f-info">
+      <b>두드림모터스</b><br>
+      주소 : 광주광역시 서구 매월1로 62번길 12, 비동 112호<br>
+      사업자등록번호 : 410-86-57475 · 자동차매매업 등록번호 : 광주 제0000호<br>
+      ※ 홈페이지의 모든 차량은 실제 보유 중인 매물이며, 판매 완료 시 즉시 표기됩니다.<br>
+      COPYRIGHT DODREAM MOTORS. ALL RIGHTS RESERVED.
+    </div>
+  </div>
+</footer>
+
+<button class="fab" id="fabAdd">+ 매물 등록</button>
+
+<!-- 매물 등록/수정 모달 -->
+<div class="modal-bg" id="formModal">
+  <div class="modal">
+    <button class="close-x" data-close="formModal">✕</button>
+    <h4 id="formTitle">매물 등록</h4>
+    <div class="form-grid">
+      <div class="fld full">
+        <label>차량 사진 (최대 20장)</label>
+        <div class="photo-drop" id="photoDrop">
+          <span>탭하여 사진 선택 · 여러 장 한 번에 가능 (원본 화질)</span>
+          <span class="photo-count" id="photoCount">0 / 20장</span>
+        </div>
+        <div class="photo-grid" id="photoGrid"></div>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+      </div>
+      <div class="fld"><label>제조사</label>
+        <select id="inBrand">
+          <option>현대</option><option>기아</option><option>제네시스</option><option>쉐보레</option>
+          <option>르노코리아</option><option>KG모빌리티</option><option>벤츠</option><option>BMW</option>
+          <option>아우디</option><option>기타 수입</option>
+        </select>
+      </div>
+      <div class="fld"><label>모델</label><input id="inModel" placeholder="예: 그랜저, 쏘렌토"></div>
+      <div class="fld"><label>차량명 (세부모델)</label><input id="inName" placeholder="그랜저 IG 2.4 프리미엄"></div>
+      <div class="fld"><label>차종</label>
+        <select id="inType"><option>경차</option><option>소형</option><option>준중형</option><option>중형</option><option>대형</option><option>SUV</option><option>RV/승합</option><option>화물</option></select>
+      </div>
+      <div class="fld"><label>연식</label><input id="inYear" type="number" placeholder="2021" min="1990" max="2027"></div>
+      <div class="fld"><label>주행거리 (km)</label><input id="inKm" type="number" placeholder="45000"></div>
+      <div class="fld"><label>연료</label>
+        <select id="inFuel"><option>가솔린</option><option>디젤</option><option>LPG</option><option>하이브리드</option><option>전기</option></select>
+      </div>
+      <div class="fld"><label>변속기</label>
+        <select id="inTrans"><option>오토</option><option>수동</option></select>
+      </div>
+      <div class="fld"><label>가격 (만원)</label><input id="inPrice" type="number" placeholder="2350"></div>
+      <div class="fld"><label>색상</label><input id="inColor" placeholder="흰색"></div>
+      <div class="fld full check-row">
+        <label><input type="checkbox" id="inDiag"> 성능점검 완료</label>
+        <label><input type="checkbox" id="inNoAcc"> 무사고</label>
+      </div>
+      <div class="fld full"><label>차량 설명</label><textarea id="inDesc" placeholder="1인 신조, 완전 무사고 차량입니다. 타이어 4짝 신품 교체..."></textarea></div>
+    </div>
+    <button class="submit" id="saveBtn">등록하기</button>
+  </div>
+</div>
+
+<!-- 상세 모달 -->
+<div class="modal-bg" id="detailModal">
+  <div class="modal">
+    <button class="close-x" data-close="detailModal">✕</button>
+    <div class="detail-photo" id="dPhoto"></div>
+    <div class="gal-strip" id="dStrip"></div>
+    <div class="detail-name" id="dName"></div>
+    <div class="detail-badges" id="dBadges"></div>
+    <div class="detail-price" id="dPrice"></div>
+    <div class="spec-table" id="dSpecs"></div>
+    <div class="detail-desc" id="dDesc"></div>
+    <a class="detail-call" id="dCall" href="tel:01049439727">📞 이성신 부장에게 전화 상담</a>
+    <a class="detail-sms" id="dSms" href="#">💬 문자로 문의하기</a>
+  </div>
+</div>
+
+<!-- 내차팔기 모달 -->
+<div class="modal-bg" id="sellModal">
+  <div class="modal">
+    <button class="close-x" data-close="sellModal">✕</button>
+    <h4>내차팔기 · 무료 감정 신청</h4>
+    <div class="form-grid">
+      <div class="fld full"><label>차량명</label><input id="sName" placeholder="예: 아반떼 CN7 1.6"></div>
+      <div class="fld"><label>연식</label><input id="sYear" type="number" placeholder="2020"></div>
+      <div class="fld"><label>주행거리 (km)</label><input id="sKm" type="number" placeholder="60000"></div>
+      <div class="fld full"><label>참고사항 (선택)</label><input id="sMemo" placeholder="무사고 여부, 희망 가격 등"></div>
+    </div>
+    <button class="submit" onclick="sendSell()">문자로 감정 신청하기</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center">버튼을 누르면 작성 내용이 담긴 문자가 준비됩니다.<br>전송 버튼만 눌러주시면 이성신 부장이 바로 연락드려요.</p>
+  </div>
+</div>
+
+<!-- 후기 작성 모달 -->
+<div class="modal-bg" id="reviewModal">
+  <div class="modal">
+    <button class="close-x" data-close="reviewModal">✕</button>
+    <h4>이용후기 작성</h4>
+    <div class="form-grid">
+      <div class="fld full">
+        <label>별점</label>
+        <div class="star-pick" id="starPick">
+          <button type="button" data-s="1">★</button>
+          <button type="button" data-s="2">★</button>
+          <button type="button" data-s="3">★</button>
+          <button type="button" data-s="4">★</button>
+          <button type="button" data-s="5">★</button>
+        </div>
+      </div>
+      <div class="fld"><label>이름</label><input id="rName" placeholder="홍길동" maxlength="10"></div>
+      <div class="fld"><label>지역 (선택)</label><input id="rRegion" placeholder="광주 서구" maxlength="12"></div>
+      <div class="fld full"><label>거래 차량</label><input id="rCar" placeholder="예: 그랜저 IG 구매 / 모닝 판매" maxlength="30"></div>
+      <div class="fld full"><label>후기 내용</label><textarea id="rTxt" placeholder="거래 경험을 남겨주세요 (최대 300자)" maxlength="300"></textarea></div>
+    </div>
+    <button class="submit" onclick="submitReview()">후기 등록</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center">이름은 개인정보 보호를 위해 가운데 글자가 ○로 표시됩니다.</p>
+  </div>
+</div>
+
+<!-- 시세문의 모달 -->
+<div class="modal-bg" id="siseModal">
+  <div class="modal">
+    <button class="close-x" data-close="siseModal">✕</button>
+    <h4>시세문의</h4>
+    <div class="form-grid">
+      <div class="fld full"><label>문의 내용</label><textarea id="siseTxt">[시세문의] 차량 시세가 궁금해서 문의드립니다. 차량명/연식: </textarea></div>
+    </div>
+    <a class="detail-call" id="siseCall" href="tel:01049439727">📞 전화로 바로 문의 (010-4943-9727)</a>
+    <a class="detail-sms" id="siseSms" href="#">💬 문자앱으로 보내기</a>
+    <button class="submit" style="margin-top:8px;background:var(--surface);color:var(--ink);border:1px solid var(--line)" onclick="copySise()">📋 내용 복사하기</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center;line-height:1.6">"문자앱으로 보내기"는 핸드폰에서만 동작합니다.<br>컴퓨터에서는 전화 또는 내용 복사를 이용해주세요.</p>
+  </div>
+</div>
+
+<!-- 전체 내용 보기 모달 -->
+<div class="modal-bg" id="viewModal">
+  <div class="modal">
+    <button class="close-x" data-close="viewModal">✕</button>
+    <h4 id="vTitle"></h4>
+    <div id="vBody"></div>
+  </div>
+</div>
+
+<!-- 관리자 로그인 모달 -->
+<div class="modal-bg" id="loginModal">
+  <div class="modal">
+    <button class="close-x" data-close="loginModal">✕</button>
+    <h4>관리자 로그인</h4>
+    <div class="fld">
+      <label>비밀번호</label>
+      <input type="password" id="pwInput" placeholder="비밀번호 입력">
+    </div>
+    <button class="submit" id="loginBtn">로그인</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center">초기 비밀번호는 <b>1234</b> 입니다</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PHONE = '01049439727';
+const ADMIN_PW = '1234';
+const KEY = 'dodream-cars';
+const MAX_PHOTOS = 20;
+const CAR_PREFIX = 'dodream-car:';
+const NOTICE_KEY = 'dodream-notices';
+const REVIEW_KEY = 'dodream-reviews';
+
+let cars = [];
+let notices = [];
+let reviews = [];
+let favs = [];
+let pickedStars = 5;
+let isAdmin = false;
+let editingId = null;
+let photoList = [];
+let galPhotos = [];
+let galIdx = 0;
+let storageOK = false;
+let curMaker = '';
+let curModel = '';
+let curSub = '';
+let curKw = '';
+let curTheme = '';
+
+function getPhotos(c) {
+  if (Array.isArray(c.photos)) return c.photos;
+  return c.photo ? [c.photo] : [];
+}
+/* 예전 데이터(모델 없음)는 차량명 첫 단어를 모델로 사용 */
+function getModel(c) {
+  return (c.model && c.model.trim()) || (c.name || '').split(' ')[0] || '기타';
+}
+function fmt(n) { return Number(n).toLocaleString('ko-KR'); }
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+function smsLink(body) { return 'sms:' + PHONE + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body); }
+
+/* ---------- 저장소 ---------- */
+async function loadAll() {
+  try {
+    if (window.storage) {
+      storageOK = true;
+      const r = await window.storage.list(CAR_PREFIX);
+      if (r && r.keys && r.keys.length) {
+        const loaded = [];
+        for (const k of r.keys) {
+          try {
+            const item = await window.storage.get(k);
+            if (item && item.value) loaded.push(JSON.parse(item.value));
+          } catch (e) {}
+        }
+        if (loaded.length) cars = loaded;
+      }
+      if (!cars.length) {
+        try {
+          const old = await window.storage.get(KEY);
+          if (old && old.value) {
+            cars = JSON.parse(old.value);
+            for (const c of cars) await saveCar(c);
+          }
+        } catch (e) {}
+      }
+      try {
+        const n = await window.storage.get(NOTICE_KEY);
+        if (n && n.value) notices = JSON.parse(n.value);
+      } catch (e) {}
+      try {
+        // 후기는 공유 데이터: 홈페이지를 보는 모든 사람에게 표시됩니다
+        const rv = await window.storage.get(REVIEW_KEY, true);
+        if (rv && rv.value) reviews = JSON.parse(rv.value);
+      } catch (e) {}
+      try {
+        const f = await window.storage.get('dodream-favs');
+        if (f && f.value) favs = JSON.parse(f.value);
+      } catch (e) {}
+    }
+  } catch (e) { storageOK = false; }
+  if (!cars.length) {
+    cars = seedCars();
+    if (storageOK) for (const c of cars) await saveCar(c);
+  }
+  if (!notices.length) {
+    notices = [
+      { id: 'n1', text: '두드림모터스 홈페이지가 새롭게 오픈했습니다.', date: today() },
+      { id: 'n2', text: '내차팔기 무료 출장 감정 서비스를 운영 중입니다.', date: today() }
+    ];
+  }
+  if (!reviews.length) {
+    reviews = [
+      { id: 'r1', name: '김민수', region: '광주 서구', car: '그랜저 IG 구매', stars: 5, text: '처음부터 끝까지 친절하게 설명해주시고, 차량 상태도 말씀하신 그대로였습니다. 믿고 거래했어요.', date: today() },
+      { id: 'r2', name: '박지영', region: '나주', car: '쏘렌토 구매', stars: 5, text: '서두르지 않고 차량을 꼼꼼히 보여주셔서 안심하고 결정했습니다. 이전 등록까지 알아서 처리해주셨어요.', date: today() },
+      { id: 'r3', name: '정수희', region: '광주 북구', car: '모닝 판매(매입)', stars: 5, text: '타던 차 팔았는데 다른 곳보다 감정가를 잘 쳐주셨습니다. 당일에 바로 입금받았어요.', date: today() }
+    ];
+    if (storageOK) await saveReviews();
+  }
+}
+async function saveCar(c) {
+  if (!storageOK) return;
+  try { await window.storage.set(CAR_PREFIX + c.id, JSON.stringify(c)); }
+  catch (e) { console.error(e); toast('저장 공간이 부족할 수 있어요. 사진 수를 줄여보세요.'); }
+}
+async function removeCarStorage(id) {
+  if (!storageOK) return;
+  try { await window.storage.delete(CAR_PREFIX + id); } catch (e) {}
+}
+async function saveNotices() {
+  if (!storageOK) return;
+  try { await window.storage.set(NOTICE_KEY, JSON.stringify(notices)); } catch (e) {}
+}
+async function saveReviews() {
+  if (!storageOK) return;
+  try { await window.storage.set(REVIEW_KEY, JSON.stringify(reviews), true); }
+  catch (e) { console.error('후기 저장 실패', e); }
+}
+async function saveFavs() {
+  if (!storageOK) return;
+  try { await window.storage.set('dodream-favs', JSON.stringify(favs)); } catch (e) {}
+}
+function today() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function seedCars() {
+  const now = Date.now();
+  return [
+    { id: 'c1', brand: '현대', model: '그랜저', name: '그랜저 IG 2.4 프리미엄', type: '대형', year: 2020, km: 58000, fuel: '가솔린', trans: '오토', price: 2190, color: '흰색', diag: true, noAcc: true, views: 12, desc: '완전 무사고 · 1인 신조 차량입니다.\n실내외 상태 최상급, 정기점검 이력 보유.', photos: [], sold: false, created: now - 300000 },
+    { id: 'c2', brand: '기아', model: '쏘렌토', name: '쏘렌토 4세대 디젤 2.2 시그니처', type: 'SUV', year: 2021, km: 42000, fuel: '디젤', trans: '오토', price: 3350, color: '검정', diag: true, noAcc: false, views: 9, desc: '풀옵션 시그니처 트림.\n파노라마 선루프 · 통풍시트 · HUD 장착.', photos: [], sold: false, created: now - 200000 },
+    { id: 'c3', brand: '기아', model: '모닝', name: '모닝 어반 1.0 프레스티지', type: '경차', year: 2019, km: 71000, fuel: '가솔린', trans: '오토', price: 790, color: '은색', diag: false, noAcc: true, views: 5, desc: '출퇴근용 최적 · 연비 우수.\n소모품 정비 완료 후 출고합니다.', photos: [], sold: true, created: now - 100000 }
+  ];
+}
+
+/* ---------- 히어로 캐러셀 ---------- */
+let heroIdx = 0, heroTimer = null;
+const HERO_N = 3;
+function heroGo(i) {
+  heroIdx = (i + HERO_N) % HERO_N;
+  document.getElementById('heroTrack').style.transform = 'translateX(-' + (heroIdx * 100) + '%)';
+  document.querySelectorAll('#heroDots button').forEach((b, j) => b.classList.toggle('cur', j === heroIdx));
+}
+window.heroMove = d => { heroGo(heroIdx + d); resetHeroTimer(); };
+function resetHeroTimer() {
+  clearInterval(heroTimer);
+  heroTimer = setInterval(() => heroGo(heroIdx + 1), 4500);
+}
+(function initHero() {
+  const dots = document.getElementById('heroDots');
+  for (let i = 0; i < HERO_N; i++) {
+    const b = document.createElement('button');
+    b.addEventListener('click', () => { heroGo(i); resetHeroTimer(); });
+    dots.appendChild(b);
+  }
+  heroGo(0); resetHeroTimer();
+})();
+
+/* ---------- 검색 탭 / 제조사 / 테마 ---------- */
+window.switchTab = t => {
+  document.getElementById('tabMaker').classList.toggle('cur', t === 'maker');
+  document.getElementById('tabKw').classList.toggle('cur', t === 'kw');
+  document.getElementById('panelMaker').style.display = t === 'maker' ? 'block' : 'none';
+  document.getElementById('panelKw').style.display = t === 'kw' ? 'flex' : 'none';
+};
+function renderCascade() {
+  const selMaker = document.getElementById('selMaker');
+  const selModel = document.getElementById('selModel');
+  const selSub = document.getElementById('selSub');
+
+  // 제조사 목록 (보유 대수 표시)
+  const makers = {};
+  cars.forEach(c => { makers[c.brand] = (makers[c.brand] || 0) + 1; });
+  selMaker.innerHTML = '<option value="">제조사 전체 (' + cars.length + '대)</option>' +
+    Object.keys(makers).map(b => `<option value="${b}" ${curMaker === b ? 'selected' : ''}>${b} (${makers[b]}대)</option>`).join('');
+
+  // 모델 목록 (선택된 제조사 기준)
+  if (curMaker) {
+    const models = {};
+    cars.filter(c => c.brand === curMaker).forEach(c => {
+      const m = getModel(c);
+      models[m] = (models[m] || 0) + 1;
+    });
+    selModel.disabled = false;
+    selModel.innerHTML = '<option value="">모델 전체</option>' +
+      Object.keys(models).map(m => `<option value="${m}" ${curModel === m ? 'selected' : ''}>${m} (${models[m]}대)</option>`).join('');
+  } else {
+    selModel.disabled = true;
+    selModel.innerHTML = '<option value="">모델 전체</option>';
+  }
+
+  // 세부모델 목록 (선택된 모델 기준, 차량명 단위)
+  if (curMaker && curModel) {
+    const subs = cars.filter(c => c.brand === curMaker && getModel(c) === curModel);
+    selSub.disabled = false;
+    selSub.innerHTML = '<option value="">세부모델 전체</option>' +
+      subs.map(c => `<option value="${c.id}" ${curSub === c.id ? 'selected' : ''}>${esc(c.name)} · ${c.year}년식</option>`).join('');
+  } else {
+    selSub.disabled = true;
+    selSub.innerHTML = '<option value="">세부모델 전체</option>';
+  }
+}
+document.getElementById('selMaker').addEventListener('change', e => {
+  curMaker = e.target.value; curModel = ''; curSub = '';
+  renderCascade();
+});
+document.getElementById('selModel').addEventListener('change', e => {
+  curModel = e.target.value; curSub = '';
+  renderCascade();
+});
+document.getElementById('selSub').addEventListener('change', e => {
+  curSub = e.target.value;
+});
+window.applyCascade = () => {
+  curKw = '';
+  render();
+  goSection('carsBlk');
+};
+window.applyKw = () => {
+  curKw = document.getElementById('searchInput').value.trim();
+  curMaker = ''; curModel = ''; curSub = '';
+  render(); goSection('carsBlk');
+};
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') applyKw(); });
+});
+window.filterTheme = th => {
+  curTheme = curTheme === th ? '' : th;
+  document.querySelectorAll('#themes button').forEach(b => b.classList.toggle('cur', b.dataset.th === curTheme));
+  render(); goSection('carsBlk');
+};
+document.querySelectorAll('#themes button').forEach(b => b.addEventListener('click', () => filterTheme(b.dataset.th)));
+
+/* ---------- 필터/정렬/렌더 ---------- */
+function matchTheme(c) {
+  switch (curTheme) {
+    case '성능점검': return !!c.diag;
+    case '무사고': return !!c.noAcc;
+    case 'SUV': return c.type === 'SUV' || c.type === 'RV/승합';
+    case '경차': return c.type === '경차';
+    case '1000이하': return c.price <= 1000;
+    case '하이브리드전기': return c.fuel === '하이브리드' || c.fuel === '전기';
+    default: return true;
+  }
+}
+function getFiltered() {
+  const sort = document.getElementById('sortSel').value;
+  let list = cars.filter(c => {
+    if (curMaker && c.brand !== curMaker) return false;
+    if (curModel && getModel(c) !== curModel) return false;
+    if (curSub && c.id !== curSub) return false;
+    if (curKw && !(c.name + c.brand + getModel(c)).includes(curKw)) return false;
+    if (!matchTheme(c)) return false;
+    return true;
+  });
+  if (sort === 'low') list.sort((a,b) => a.price - b.price);
+  else if (sort === 'high') list.sort((a,b) => b.price - a.price);
+  else if (sort === 'km') list.sort((a,b) => a.km - b.km);
+  else if (sort === 'pop') list.sort((a,b) => (b.views||0) - (a.views||0));
+  else list.sort((a,b) => b.created - a.created);
+  return list;
+}
+function render() {
+  document.getElementById('totalNum').textContent = cars.length;
+  renderCascade();
+  renderRank();
+  renderNotices();
+  renderReviews();
+  const list = getFiltered();
+  document.getElementById('countNum').textContent = list.length;
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty"><b>조건에 맞는 매물이 없습니다</b>필터를 변경하시거나 이성신 부장에게 원하시는 차량을 문의해주세요.</div>';
+    return;
+  }
+  list.forEach(c => {
+    const ps = getPhotos(c);
+    const isFav = favs.includes(c.id);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="thumb">
+        ${ps.length ? `<img src="${ps[0]}" alt="${c.name}">` : '사진 준비중'}
+        ${ps.length > 1 ? `<div class="photo-num">📷 ${ps.length}</div>` : ''}
+        <div class="badges">
+          ${c.diag ? '<span class="bdg diag">성능점검</span>' : ''}
+          ${c.noAcc ? '<span class="bdg noacc">무사고</span>' : ''}
+          ${!c.sold && (Date.now() - c.created < 86400000 * 3) ? '<span class="bdg new">NEW</span>' : ''}
+        </div>
+        ${c.sold ? '<div class="sold-overlay">판매완료</div>' : ''}
+      </div>
+      <button class="fav ${isFav ? 'on' : ''}" data-id="${c.id}">♥</button>
+      <div class="card-body">
+        <div class="name">[${c.brand}] ${c.name}</div>
+        <div class="specs"><span>${c.year}년식</span><span>${fmt(c.km)}km</span><span>${c.fuel}</span><span>광주</span></div>
+        <div class="price">${fmt(c.price)}<small>만원</small></div>
+      </div>
+      ${isAdmin ? `
+      <div class="admin-actions">
+        <button class="edit">수정</button>
+        <button class="sold-toggle">${c.sold ? '판매중으로' : '판매완료'}</button>
+        <button class="del">삭제</button>
+      </div>` : ''}
+    `;
+    card.querySelector('.card-body').addEventListener('click', () => openDetail(c.id));
+    card.querySelector('.thumb').addEventListener('click', () => openDetail(c.id));
+    card.querySelector('.fav').addEventListener('click', async e => {
+      e.stopPropagation();
+      if (favs.includes(c.id)) { favs = favs.filter(x => x !== c.id); toast('찜 해제되었습니다'); }
+      else { favs.push(c.id); toast('찜 목록에 담았습니다 ♥'); }
+      await saveFavs(); render();
+    });
+    if (isAdmin) {
+      card.querySelector('.edit').addEventListener('click', e => { e.stopPropagation(); openForm(c.id); });
+      card.querySelector('.sold-toggle').addEventListener('click', async e => {
+        e.stopPropagation();
+        c.sold = !c.sold; await saveCar(c); render();
+        toast(c.sold ? '판매완료 처리되었습니다' : '판매중으로 변경되었습니다');
+      });
+      card.querySelector('.del').addEventListener('click', async e => {
+        e.stopPropagation();
+        if (confirm('[' + c.name + '] 매물을 삭제할까요?')) {
+          cars = cars.filter(x => x.id !== c.id);
+          await removeCarStorage(c.id);
+          render(); toast('매물이 삭제되었습니다');
+        }
+      });
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- 인기순위 ---------- */
+function renderRank() {
+  const top = [...cars].sort((a,b) => (b.views||0) - (a.views||0)).slice(0, 6);
+  const ol = document.getElementById('rankList');
+  ol.innerHTML = top.map((c, i) => `
+    <li onclick="openDetail('${c.id}')">
+      <span class="no">${i+1}</span>
+      <b>[${c.brand}] ${c.name}</b>
+      <span>조회 ${c.views||0}</span>
+    </li>
+  `).join('');
+}
+
+/* ---------- 공지사항 ---------- */
+function noticeRowHtml(n, clickable) {
+  return `
+    <div class="n-row" ${clickable ? `onclick="openNoticeView('${n.id}')"` : ''}>
+      <b>${esc(n.text)}</b>
+      <time>${n.date}</time>
+      ${isAdmin ? `<button class="n-del" onclick="event.stopPropagation();delNotice('${n.id}')">삭제</button>` : ''}
+    </div>
+  `;
+}
+function renderNotices() {
+  const box = document.getElementById('noticeList');
+  const more = document.getElementById('noticeMore');
+  if (!notices.length) {
+    box.innerHTML = '<div class="n-row"><b>등록된 공지가 없습니다.</b></div>';
+    more.innerHTML = '';
+    return;
+  }
+  box.innerHTML = notices.slice(0, 2).map(n => noticeRowHtml(n, true)).join('');
+  more.innerHTML = notices.length > 2
+    ? `<button class="more-btn" onclick="openAllNotices()">전체 공지 ${notices.length}개 모두 보기</button>`
+    : '';
+}
+window.openNoticeView = id => {
+  const n = notices.find(x => x.id === id);
+  if (!n) return;
+  document.getElementById('vTitle').textContent = '공지사항';
+  document.getElementById('vBody').innerHTML = `
+    <div class="v-notice">
+      <b>${esc(n.text)}</b>
+      <time>${n.date}</time>
+      ${isAdmin ? `<button class="n-del" style="margin-top:8px" onclick="delNotice('${n.id}');closeModal('viewModal')">이 공지 삭제</button>` : ''}
+    </div>
+  `;
+  openModal('viewModal');
+};
+window.openAllNotices = () => {
+  document.getElementById('vTitle').textContent = '전체 공지사항 (' + notices.length + ')';
+  document.getElementById('vBody').innerHTML = notices.map(n => `
+    <div class="v-notice">
+      <b>${esc(n.text)}</b>
+      <time>${n.date}</time>
+      ${isAdmin ? `<button class="n-del" style="margin-top:8px" onclick="delNotice('${n.id}');openAllNotices()">이 공지 삭제</button>` : ''}
+    </div>
+  `).join('');
+  openModal('viewModal');
+};
+window.addNotice = async () => {
+  const v = document.getElementById('noticeInput').value.trim();
+  if (!v) return;
+  notices.unshift({ id: 'n' + Date.now(), text: v, date: today() });
+  document.getElementById('noticeInput').value = '';
+  await saveNotices(); renderNotices(); toast('공지가 등록되었습니다');
+};
+window.delNotice = async id => {
+  notices = notices.filter(n => n.id !== id);
+  await saveNotices(); renderNotices(); toast('공지가 삭제되었습니다');
+};
+
+/* ---------- 이용후기 ---------- */
+function maskName(n) {
+  if (!n) return '고객';
+  if (n.length === 1) return n;
+  if (n.length === 2) return n[0] + '○';
+  return n[0] + '○'.repeat(n.length - 2) + n[n.length - 1];
+}
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function reviewCardHtml(r, full) {
+  return `
+    <div class="${full ? 'v-review' : 'review'}" ${full ? '' : `onclick="openReviewView('${r.id}')"`}>
+      ${isAdmin ? `<button class="r-del" style="${full ? 'display:block' : ''}" onclick="event.stopPropagation();delReview('${r.id}')">삭제</button>` : ''}
+      <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+      <div class="r-car">${esc(r.car)}</div>
+      <div class="${full ? 'r-txt-full' : 'r-txt'}">${esc(r.text)}</div>
+      <div class="r-by">${maskName(r.name)} 님${r.region ? ' · ' + esc(r.region) : ''} · ${r.date}</div>
+    </div>
+  `;
+}
+function renderReviews() {
+  document.getElementById('reviewNum').textContent = reviews.length;
+  const box = document.getElementById('reviews');
+  const more = document.getElementById('reviewMore');
+  if (!reviews.length) {
+    box.innerHTML = '<div class="empty-r">아직 등록된 후기가 없습니다. 첫 후기를 남겨주세요!</div>';
+    more.innerHTML = '';
+    return;
+  }
+  box.innerHTML = reviews.slice(0, 5).map(r => reviewCardHtml(r, false)).join('');
+  more.innerHTML = reviews.length > 5
+    ? `<button class="more-btn" onclick="openAllReviews()">전체 후기 ${reviews.length}개 모두 보기</button>`
+    : '';
+}
+window.openReviewView = id => {
+  const r = reviews.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('vTitle').textContent = '이용후기';
+  document.getElementById('vBody').innerHTML = reviewCardHtml(r, true);
+  openModal('viewModal');
+};
+window.openAllReviews = () => {
+  document.getElementById('vTitle').textContent = '전체 이용후기 (' + reviews.length + ')';
+  document.getElementById('vBody').innerHTML = reviews.map(r => reviewCardHtml(r, true)).join('');
+  openModal('viewModal');
+};
+function setStars(n) {
+  pickedStars = n;
+  document.querySelectorAll('#starPick button').forEach(b =>
+    b.classList.toggle('on', Number(b.dataset.s) <= n));
+}
+document.querySelectorAll('#starPick button').forEach(b =>
+  b.addEventListener('click', () => setStars(Number(b.dataset.s))));
+window.openReviewForm = () => {
+  document.getElementById('rName').value = '';
+  document.getElementById('rRegion').value = '';
+  document.getElementById('rCar').value = '';
+  document.getElementById('rTxt').value = '';
+  setStars(5);
+  openModal('reviewModal');
+};
+window.submitReview = async () => {
+  const name = document.getElementById('rName').value.trim();
+  const car = document.getElementById('rCar').value.trim();
+  const text = document.getElementById('rTxt').value.trim();
+  if (!name || !car || !text) { toast('이름 · 거래 차량 · 후기 내용은 필수입니다'); return; }
+  reviews.unshift({
+    id: 'r' + Date.now(),
+    name, car, text,
+    region: document.getElementById('rRegion').value.trim(),
+    stars: pickedStars,
+    date: today()
+  });
+  await saveReviews();
+  closeModal('reviewModal');
+  renderReviews();
+  toast('소중한 후기 감사합니다!');
+};
+window.delReview = async id => {
+  if (!confirm('이 후기를 삭제할까요?')) return;
+  reviews = reviews.filter(r => r.id !== id);
+  await saveReviews();
+  renderReviews();
+  toast('후기가 삭제되었습니다');
+};
+
+/* ---------- 상세 + 갤러리 ---------- */
+function renderGallery() {
+  const box = document.getElementById('dPhoto');
+  const strip = document.getElementById('dStrip');
+  if (!galPhotos.length) { box.innerHTML = '사진 준비중'; strip.innerHTML = ''; return; }
+  box.innerHTML = `
+    <img src="${galPhotos[galIdx]}">
+    ${galPhotos.length > 1 ? `
+      <button class="gal-nav prev" onclick="galMove(-1)">‹</button>
+      <button class="gal-nav next" onclick="galMove(1)">›</button>
+      <div class="gal-idx">${galIdx + 1} / ${galPhotos.length}</div>` : ''}
+  `;
+  strip.innerHTML = galPhotos.map((p, i) =>
+    `<img src="${p}" class="${i === galIdx ? 'cur' : ''}" onclick="galGo(${i})">`
+  ).join('');
+}
+window.galMove = d => { galIdx = (galIdx + d + galPhotos.length) % galPhotos.length; renderGallery(); };
+window.galGo = i => { galIdx = i; renderGallery(); };
+
+window.openDetail = async function(id) {
+  const c = cars.find(x => x.id === id);
+  if (!c) return;
+  c.views = (c.views || 0) + 1;
+  saveCar(c);
+  galPhotos = getPhotos(c); galIdx = 0; renderGallery();
+  document.getElementById('dName').textContent = `[${c.brand}] ${c.name}${c.sold ? ' (판매완료)' : ''}`;
+  document.getElementById('dBadges').innerHTML =
+    (c.diag ? '<span class="bdg diag">성능점검 완료</span>' : '') +
+    (c.noAcc ? '<span class="bdg noacc">무사고</span>' : '');
+  document.getElementById('dPrice').innerHTML = fmt(c.price) + ' <small>만원</small>';
+  document.getElementById('dSpecs').innerHTML = [
+    ['모델', getModel(c)], ['차종', c.type || '-'], ['연식', c.year + '년식'], ['주행거리', fmt(c.km) + ' km'],
+    ['연료', c.fuel], ['변속기', c.trans], ['색상', c.color || '-'], ['지역', '광주']
+  ].map(([k,v]) => `<div class="row"><span>${k}</span><span>${v}</span></div>`).join('');
+  document.getElementById('dDesc').textContent = c.desc || '';
+  document.getElementById('dSms').href = smsLink(`[두드림모터스] ${c.name} (${fmt(c.price)}만원) 차량 문의드립니다.`);
+  openModal('detailModal');
+};
+
+/* ---------- 등록/수정 폼 ---------- */
+function openForm(id) {
+  editingId = id || null;
+  const c = id ? cars.find(x => x.id === id) : null;
+  photoList = c ? [...getPhotos(c)] : [];
+  document.getElementById('formTitle').textContent = c ? '매물 수정' : '매물 등록';
+  document.getElementById('saveBtn').textContent = c ? '수정 완료' : '등록하기';
+  document.getElementById('inBrand').value = c ? c.brand : '현대';
+  document.getElementById('inModel').value = c ? (c.model || getModel(c)) : '';
+  document.getElementById('inName').value = c ? c.name : '';
+  document.getElementById('inType').value = c ? (c.type || '중형') : '중형';
+  document.getElementById('inYear').value = c ? c.year : '';
+  document.getElementById('inKm').value = c ? c.km : '';
+  document.getElementById('inFuel').value = c ? c.fuel : '가솔린';
+  document.getElementById('inTrans').value = c ? c.trans : '오토';
+  document.getElementById('inPrice').value = c ? c.price : '';
+  document.getElementById('inColor').value = c ? (c.color || '') : '';
+  document.getElementById('inDiag').checked = c ? !!c.diag : false;
+  document.getElementById('inNoAcc').checked = c ? !!c.noAcc : false;
+  document.getElementById('inDesc').value = c ? (c.desc || '') : '';
+  renderPhotoGrid();
+  openModal('formModal');
+}
+function renderPhotoGrid() {
+  document.getElementById('photoCount').textContent = photoList.length + ' / ' + MAX_PHOTOS + '장';
+  document.getElementById('photoGrid').innerHTML = photoList.map((p, i) => `
+    <div class="ph">
+      <img src="${p}">
+      <button class="rm" onclick="removePhoto(${i})">✕</button>
+      ${i === 0 ? '<div class="main-badge">대표</div>' : ''}
+    </div>
+  `).join('');
+}
+window.removePhoto = i => { photoList.splice(i, 1); renderPhotoGrid(); };
+
+document.getElementById('photoDrop').addEventListener('click', () => {
+  if (photoList.length >= MAX_PHOTOS) { toast('사진은 최대 ' + MAX_PHOTOS + '장까지 가능합니다'); return; }
+  document.getElementById('photoInput').click();
+});
+function readOriginal(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = ev => resolve(ev.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+document.getElementById('photoInput').addEventListener('change', async e => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  const room = MAX_PHOTOS - photoList.length;
+  const selected = files.slice(0, room);
+  if (files.length > room) toast('최대 ' + MAX_PHOTOS + '장까지만 등록됩니다 (' + (files.length - room) + '장 제외)');
+  for (const f of selected) {
+    try { photoList.push(await readOriginal(f)); renderPhotoGrid(); }
+    catch (err) { console.error('사진 처리 실패', err); }
+  }
+  const totalMB = photoList.reduce((s, p) => s + p.length, 0) / 1024 / 1024;
+  if (totalMB > 4) toast('사진 용량이 커서 저장이 안 될 수 있어요 (' + totalMB.toFixed(1) + 'MB)');
+  e.target.value = '';
+});
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const name = document.getElementById('inName').value.trim();
+  const year = Number(document.getElementById('inYear').value);
+  const price = Number(document.getElementById('inPrice').value);
+  if (!name || !year || !price) { toast('차량명 · 연식 · 가격은 필수입니다'); return; }
+  const data = {
+    brand: document.getElementById('inBrand').value,
+    model: document.getElementById('inModel').value.trim(),
+    name, year,
+    type: document.getElementById('inType').value,
+    km: Number(document.getElementById('inKm').value) || 0,
+    fuel: document.getElementById('inFuel').value,
+    trans: document.getElementById('inTrans').value,
+    price,
+    color: document.getElementById('inColor').value.trim(),
+    diag: document.getElementById('inDiag').checked,
+    noAcc: document.getElementById('inNoAcc').checked,
+    desc: document.getElementById('inDesc').value.trim(),
+    photos: [...photoList]
+  };
+  let target;
+  if (editingId) {
+    target = cars.find(x => x.id === editingId);
+    delete target.photo;
+    Object.assign(target, data);
+    toast('매물이 수정되었습니다');
+  } else {
+    target = { id: 'c' + Date.now(), ...data, views: 0, sold: false, created: Date.now() };
+    cars.unshift(target);
+    toast('새 매물이 등록되었습니다');
+  }
+  await saveCar(target);
+  closeModal('formModal');
+  render();
+});
+
+/* ---------- 내차팔기 / 시세문의 ---------- */
+function openSms(body) {
+  // 앵커 클릭 방식이 사파리/일부 브라우저에서 더 안정적으로 동작
+  const a = document.createElement('a');
+  a.href = smsLink(body);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+async function copyText(txt) {
+  try {
+    await navigator.clipboard.writeText(txt);
+    return true;
+  } catch (e) {
+    // 클립보드 API가 막힌 환경 폴백
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove();
+    return ok;
+  }
+}
+window.sendSell = () => {
+  const n = document.getElementById('sName').value.trim();
+  if (!n) { toast('차량명을 입력해주세요'); return; }
+  const y = document.getElementById('sYear').value;
+  const k = document.getElementById('sKm').value;
+  const m = document.getElementById('sMemo').value.trim();
+  let body = `[내차팔기 감정신청] ${n}`;
+  if (y) body += ` / ${y}년식`;
+  if (k) body += ` / ${fmt(k)}km`;
+  if (m) body += ` / ${m}`;
+  body += ' — 감정 부탁드립니다.';
+  closeModal('sellModal');
+  openSms(body);
+};
+window.openSise = () => {
+  const sms = document.getElementById('siseSms');
+  sms.onclick = e => {
+    e.preventDefault();
+    openSms(document.getElementById('siseTxt').value);
+  };
+  openModal('siseModal');
+};
+window.copySise = async () => {
+  const txt = document.getElementById('siseTxt').value + ' (두드림모터스 이성신 부장 010-4943-9727)';
+  const ok = await copyText(txt);
+  toast(ok ? '문의 내용이 복사되었습니다. 문자나 카톡에 붙여넣어 주세요!' : '복사에 실패했어요. 내용을 길게 눌러 직접 복사해주세요.');
+};
+
+/* ---------- 관리자 ---------- */
+document.getElementById('adminToggle').addEventListener('click', () => {
+  if (isAdmin) {
+    isAdmin = false;
+    document.body.classList.remove('admin');
+    const b = document.getElementById('adminToggle');
+    b.classList.remove('on'); b.textContent = '관리자';
+    render(); toast('관리자 모드가 종료되었습니다');
+  } else {
+    document.getElementById('pwInput').value = '';
+    openModal('loginModal');
+  }
+});
+document.getElementById('loginBtn').addEventListener('click', tryLogin);
+document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+function tryLogin() {
+  if (document.getElementById('pwInput').value === ADMIN_PW) {
+    isAdmin = true;
+    document.body.classList.add('admin');
+    const b = document.getElementById('adminToggle');
+    b.classList.add('on'); b.textContent = '관리자 모드 ON';
+    closeModal('loginModal');
+    render(); toast('관리자 모드로 전환되었습니다');
+  } else toast('비밀번호가 올바르지 않습니다');
+}
+document.getElementById('fabAdd').addEventListener('click', () => openForm(null));
+
+/* ---------- 공통 ---------- */
+document.getElementById('sortSel').addEventListener('change', render);
+window.goSection = id => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+window.scrollTop_ = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+window.openModal = id => document.getElementById(id).classList.add('open');
+window.closeModal = id => document.getElementById(id).classList.remove('open');
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => closeModal(b.dataset.close)));
+document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); }));
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------- 시작 ---------- */
+(async () => { await loadAll(); render(); })();
+</script>
+</body>
+</html>
