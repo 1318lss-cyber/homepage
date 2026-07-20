@@ -701,6 +701,7 @@
 </footer>
 
 <button class="fab" id="fabAdd">+ 매물 등록</button>
+<button class="fab" id="fabExport" style="right: 20px; bottom: 84px; background: var(--dark); color: var(--yellow-lite); box-shadow: 0 10px 28px rgba(23,24,28,.35);">⬇ 배포 파일 저장</button>
 
 <!-- 매물 등록/수정 모달 -->
 <div class="modal-bg" id="formModal">
@@ -848,6 +849,8 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* 배포 시 관리자 데이터가 이 자리에 새겨집니다 */
+window.DODREAM_DATA = null;/*DODREAM_DATA_END*/
 const PHONE = '01049439727';
 const ADMIN_PW = '1234';
 const KEY = 'dodream-cars';
@@ -885,46 +888,91 @@ function fmt(n) { return Number(n).toLocaleString('ko-KR'); }
 const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 function smsLink(body) { return 'sms:' + PHONE + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(body); }
 
-/* ---------- 저장소 ---------- */
+/* ---------- 저장소 (Claude 저장소 → 브라우저 localStorage → 메모리 순서로 자동 선택) ---------- */
+const store = {
+  mode: 'memory',
+  init() {
+    try { if (window.storage) { this.mode = 'claude'; return; } } catch (e) {}
+    try {
+      localStorage.setItem('__dodream_test', '1');
+      localStorage.removeItem('__dodream_test');
+      this.mode = 'local';
+    } catch (e) { this.mode = 'memory'; }
+  },
+  async get(k, shared) {
+    if (this.mode === 'claude') return window.storage.get(k, shared);
+    if (this.mode === 'local') {
+      const v = localStorage.getItem(k);
+      return v === null ? null : { value: v };
+    }
+    return null;
+  },
+  async set(k, v, shared) {
+    if (this.mode === 'claude') return window.storage.set(k, v, shared);
+    if (this.mode === 'local') { localStorage.setItem(k, v); return {}; }
+    return null;
+  },
+  async del(k, shared) {
+    if (this.mode === 'claude') return window.storage.delete(k, shared);
+    if (this.mode === 'local') { localStorage.removeItem(k); return {}; }
+    return null;
+  },
+  async list(prefix, shared) {
+    if (this.mode === 'claude') return window.storage.list(prefix, shared);
+    if (this.mode === 'local') {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!prefix || k.startsWith(prefix)) keys.push(k);
+      }
+      return { keys };
+    }
+    return { keys: [] };
+  }
+};
+
 async function loadAll() {
+  store.init();
+  storageOK = store.mode !== 'memory';
+
+  /* 1) 배포 파일에 새겨진 데이터가 있으면 기본값으로 사용 (GitHub Pages 방문자용) */
+  const baked = window.DODREAM_DATA;
+  if (baked) {
+    if (Array.isArray(baked.cars) && baked.cars.length) cars = baked.cars;
+    if (Array.isArray(baked.notices) && baked.notices.length) notices = baked.notices;
+    if (Array.isArray(baked.reviews) && baked.reviews.length) reviews = baked.reviews;
+  }
+
+  /* 2) 저장소에 데이터가 있으면 그것이 우선 (관리자 본인의 최신 수정본) */
   try {
-    if (window.storage) {
-      storageOK = true;
-      const r = await window.storage.list(CAR_PREFIX);
+    if (storageOK) {
+      const r = await store.list(CAR_PREFIX);
       if (r && r.keys && r.keys.length) {
         const loaded = [];
         for (const k of r.keys) {
           try {
-            const item = await window.storage.get(k);
+            const item = await store.get(k);
             if (item && item.value) loaded.push(JSON.parse(item.value));
           } catch (e) {}
         }
         if (loaded.length) cars = loaded;
       }
-      if (!cars.length) {
-        try {
-          const old = await window.storage.get(KEY);
-          if (old && old.value) {
-            cars = JSON.parse(old.value);
-            for (const c of cars) await saveCar(c);
-          }
-        } catch (e) {}
-      }
       try {
-        const n = await window.storage.get(NOTICE_KEY);
+        const n = await store.get(NOTICE_KEY);
         if (n && n.value) notices = JSON.parse(n.value);
       } catch (e) {}
       try {
-        // 후기는 공유 데이터: 홈페이지를 보는 모든 사람에게 표시됩니다
-        const rv = await window.storage.get(REVIEW_KEY, true);
+        const rv = await store.get(REVIEW_KEY, true);
         if (rv && rv.value) reviews = JSON.parse(rv.value);
       } catch (e) {}
       try {
-        const f = await window.storage.get('dodream-favs');
+        const f = await store.get('dodream-favs');
         if (f && f.value) favs = JSON.parse(f.value);
       } catch (e) {}
     }
-  } catch (e) { storageOK = false; }
+  } catch (e) {}
+
+  /* 3) 아무것도 없으면 샘플 데이터 */
   if (!cars.length) {
     cars = seedCars();
     if (storageOK) for (const c of cars) await saveCar(c);
@@ -946,25 +994,25 @@ async function loadAll() {
 }
 async function saveCar(c) {
   if (!storageOK) return;
-  try { await window.storage.set(CAR_PREFIX + c.id, JSON.stringify(c)); }
+  try { await store.set(CAR_PREFIX + c.id, JSON.stringify(c)); }
   catch (e) { console.error(e); toast('저장 공간이 부족할 수 있어요. 사진 수를 줄여보세요.'); }
 }
 async function removeCarStorage(id) {
   if (!storageOK) return;
-  try { await window.storage.delete(CAR_PREFIX + id); } catch (e) {}
+  try { await store.del(CAR_PREFIX + id); } catch (e) {}
 }
 async function saveNotices() {
   if (!storageOK) return;
-  try { await window.storage.set(NOTICE_KEY, JSON.stringify(notices)); } catch (e) {}
+  try { await store.set(NOTICE_KEY, JSON.stringify(notices)); } catch (e) {}
 }
 async function saveReviews() {
   if (!storageOK) return;
-  try { await window.storage.set(REVIEW_KEY, JSON.stringify(reviews), true); }
+  try { await store.set(REVIEW_KEY, JSON.stringify(reviews), true); }
   catch (e) { console.error('후기 저장 실패', e); }
 }
 async function saveFavs() {
   if (!storageOK) return;
-  try { await window.storage.set('dodream-favs', JSON.stringify(favs)); } catch (e) {}
+  try { await store.set('dodream-favs', JSON.stringify(favs)); } catch (e) {}
 }
 function today() {
   const d = new Date();
@@ -1552,6 +1600,34 @@ function tryLogin() {
   } else toast('비밀번호가 올바르지 않습니다');
 }
 document.getElementById('fabAdd').addEventListener('click', () => openForm(null));
+
+/* ---------- 배포 파일 내보내기 (GitHub Pages용) ---------- */
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type: type || 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+document.getElementById('fabExport').addEventListener('click', async () => {
+  toast('배포 파일을 만드는 중...');
+  const payload = JSON.stringify({ cars, notices, reviews });
+  try {
+    const res = await fetch(location.href, { cache: 'no-store' });
+    if (!res.ok) throw new Error('fetch 실패');
+    let src = await res.text();
+    const marker = /window\.DODREAM_DATA\s*=\s*[\s\S]*?;\/\*DODREAM_DATA_END\*\//;
+    if (!marker.test(src)) throw new Error('마커 없음');
+    src = src.replace(marker, 'window.DODREAM_DATA = ' + payload + ';/*DODREAM_DATA_END*/');
+    downloadFile('index.html', src);
+    toast('index.html 다운로드 완료! GitHub에 업로드하면 반영됩니다.');
+  } catch (e) {
+    // 파일을 직접 열어본 경우(file://) 등 소스를 읽을 수 없으면 데이터만 백업
+    downloadFile('dodream-data.json', payload, 'application/json');
+    toast('이 환경에서는 데이터 백업(json)만 저장됩니다. 인터넷에 올린 주소에서 다시 시도해주세요.');
+  }
+});
 
 /* ---------- 공통 ---------- */
 document.getElementById('sortSel').addEventListener('change', render);
