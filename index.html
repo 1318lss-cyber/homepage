@@ -813,7 +813,7 @@
 <div class="modal-bg" id="siseModal">
   <div class="modal">
     <button class="close-x" data-close="siseModal">✕</button>
-    <h4>시세문의</h4>
+    <h4 id="siseTitle">시세문의</h4>
     <div class="form-grid">
       <div class="fld full"><label>문의 내용</label><textarea id="siseTxt">[시세문의] 차량 시세가 궁금해서 문의드립니다. 차량명/연식: </textarea></div>
     </div>
@@ -1435,7 +1435,16 @@ window.openDetail = async function(id) {
     ['연료', c.fuel], ['변속기', c.trans], ['색상', c.color || '-'], ['지역', '광주']
   ].map(([k,v]) => `<div class="row"><span>${k}</span><span>${v}</span></div>`).join('');
   document.getElementById('dDesc').textContent = c.desc || '';
-  document.getElementById('dSms').href = smsLink(`[두드림모터스] ${c.name} (${fmt(c.price)}만원) 차량 문의드립니다.`);
+  const inquiry = `[두드림모터스] ${c.name} (${fmt(c.price)}만원) 차량 문의드립니다.`;
+  const dSms = document.getElementById('dSms');
+  dSms.href = smsLink(inquiry);
+  dSms.onclick = e => {
+    if (!isMobile) {
+      e.preventDefault();
+      copyText(inquiry + ' — 010-4943-9727').then(ok =>
+        toast(ok ? '문의 내용이 복사되었습니다. 문자나 카톡에 붙여넣어 주세요!' : '복사에 실패했어요.'));
+    }
+  };
   openModal('detailModal');
 };
 
@@ -1562,6 +1571,12 @@ async function copyText(txt) {
     return ok;
   }
 }
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+/* 문자 보내기 버튼 동작 (모달 공용) */
+document.getElementById('siseSms').addEventListener('click', e => {
+  e.preventDefault();
+  openSms(document.getElementById('siseTxt').value);
+});
 window.sendSell = () => {
   const n = document.getElementById('sName').value.trim();
   if (!n) { toast('차량명을 입력해주세요'); return; }
@@ -1574,14 +1589,19 @@ window.sendSell = () => {
   if (m) body += ` / ${m}`;
   body += ' — 감정 부탁드립니다.';
   closeModal('sellModal');
-  openSms(body);
+  if (isMobile) {
+    // 모바일: 문자앱 바로 열기
+    openSms(body);
+  } else {
+    // PC: 전화 / 문자 / 복사 중 선택할 수 있는 창 표시
+    document.getElementById('siseTitle').textContent = '감정 신청 보내기';
+    document.getElementById('siseTxt').value = body;
+    openModal('siseModal');
+  }
 };
 window.openSise = () => {
-  const sms = document.getElementById('siseSms');
-  sms.onclick = e => {
-    e.preventDefault();
-    openSms(document.getElementById('siseTxt').value);
-  };
+  document.getElementById('siseTitle').textContent = '시세문의';
+  document.getElementById('siseTxt').value = '[시세문의] 차량 시세가 궁금해서 문의드립니다. 차량명/연식: ';
   openModal('siseModal');
 };
 window.copySise = async () => {
