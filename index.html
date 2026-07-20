@@ -702,6 +702,7 @@
 
 <button class="fab" id="fabAdd">+ 매물 등록</button>
 <button class="fab" id="fabExport" style="right: 20px; bottom: 84px; background: var(--dark); color: var(--yellow-lite); box-shadow: 0 10px 28px rgba(23,24,28,.35);">⬇ 배포 파일 저장</button>
+<button class="fab" id="fabPw" style="right: 20px; bottom: 148px; background: #fff; color: var(--ink); border: 1px solid var(--line); box-shadow: var(--sh-md);" onclick="openModal('pwChangeModal')">🔑 비밀번호 변경</button>
 
 <!-- 매물 등록/수정 모달 -->
 <div class="modal-bg" id="formModal">
@@ -842,7 +843,20 @@
       <input type="password" id="pwInput" placeholder="비밀번호 입력">
     </div>
     <button class="submit" id="loginBtn">로그인</button>
-    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center">초기 비밀번호는 <b>1234</b> 입니다</p>
+  </div>
+</div>
+
+<!-- 비밀번호 변경 모달 -->
+<div class="modal-bg" id="pwChangeModal">
+  <div class="modal">
+    <button class="close-x" data-close="pwChangeModal">✕</button>
+    <h4>관리자 비밀번호 변경</h4>
+    <div class="form-grid">
+      <div class="fld full"><label>새 비밀번호</label><input type="password" id="newPw1" placeholder="새 비밀번호 (4자 이상)"></div>
+      <div class="fld full"><label>새 비밀번호 확인</label><input type="password" id="newPw2" placeholder="한 번 더 입력"></div>
+    </div>
+    <button class="submit" onclick="changePw()">변경하기</button>
+    <p style="margin-top:12px;font-size:12px;color:var(--sub);text-align:center;line-height:1.6">변경한 비밀번호는 이 브라우저에 안전하게(암호화) 저장됩니다.<br>다른 기기에서는 별도로 변경해주세요.</p>
   </div>
 </div>
 
@@ -852,7 +866,9 @@
 /* 배포 시 관리자 데이터가 이 자리에 새겨집니다 */
 window.DODREAM_DATA = null;/*DODREAM_DATA_END*/
 const PHONE = '01049439727';
-const ADMIN_PW = '1234';
+/* 기본 비밀번호는 해시로만 저장 (소스에 평문 노출 방지) */
+const DEFAULT_PW_HASHES = ['03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'x7c78c98f'];
+const PW_KEY = 'dodream-adminpw';
 const KEY = 'dodream-cars';
 const MAX_PHOTOS = 20;
 const CAR_PREFIX = 'dodream-car:';
@@ -1589,16 +1605,59 @@ document.getElementById('adminToggle').addEventListener('click', () => {
 });
 document.getElementById('loginBtn').addEventListener('click', tryLogin);
 document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
-function tryLogin() {
-  if (document.getElementById('pwInput').value === ADMIN_PW) {
+
+function djb2(s) {
+  let h = 5381;
+  for (const ch of s) { h = ((h << 5) + h + ch.charCodeAt(0)) >>> 0; }
+  return 'x' + h.toString(16);
+}
+async function hashPw(s) {
+  try {
+    if (crypto && crypto.subtle) {
+      const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+      return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) {}
+  return djb2(s);
+}
+async function getSavedPwHashes() {
+  try {
+    const r = await store.get(PW_KEY);
+    if (r && r.value) return JSON.parse(r.value); // [sha256, djb2]
+  } catch (e) {}
+  return null;
+}
+async function tryLogin() {
+  const input = document.getElementById('pwInput').value;
+  if (!input) { toast('비밀번호를 입력해주세요'); return; }
+  const saved = await getSavedPwHashes();
+  const valid = saved || DEFAULT_PW_HASHES;
+  const h1 = await hashPw(input);
+  const h2 = djb2(input);
+  if (valid.includes(h1) || valid.includes(h2)) {
     isAdmin = true;
     document.body.classList.add('admin');
     const b = document.getElementById('adminToggle');
     b.classList.add('on'); b.textContent = '관리자 모드 ON';
     closeModal('loginModal');
     render(); toast('관리자 모드로 전환되었습니다');
+    if (!saved) toast('보안을 위해 비밀번호를 꼭 변경해주세요 (좌측 하단 🔑)');
   } else toast('비밀번호가 올바르지 않습니다');
 }
+window.changePw = async () => {
+  const p1 = document.getElementById('newPw1').value;
+  const p2 = document.getElementById('newPw2').value;
+  if (p1.length < 4) { toast('비밀번호는 4자 이상으로 해주세요'); return; }
+  if (p1 !== p2) { toast('두 비밀번호가 일치하지 않습니다'); return; }
+  const hashes = [await hashPw(p1), djb2(p1)];
+  try {
+    await store.set(PW_KEY, JSON.stringify(hashes));
+    closeModal('pwChangeModal');
+    document.getElementById('newPw1').value = '';
+    document.getElementById('newPw2').value = '';
+    toast('비밀번호가 변경되었습니다');
+  } catch (e) { toast('저장에 실패했어요. 다시 시도해주세요.'); }
+};
 document.getElementById('fabAdd').addEventListener('click', () => openForm(null));
 
 /* ---------- 배포 파일 내보내기 (GitHub Pages용) ---------- */
