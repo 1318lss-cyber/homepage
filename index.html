@@ -1740,40 +1740,23 @@ function toast(msg) {
 
 /* ---------- 시작 ---------- */
 
-/* ---------- 몰던카 사진 자동 연결 ---------- */
-const MC_SUFFIXES = ['', '_640', '_600', '_400', '_320', '_240', '_160', '_120', '_76'];
-function mcPath(id, file) { return 'moldeoncar.com/car_img2/car_' + (Math.floor(id / 1000) * 1000) + '/' + file; }
-const MC_BUILDERS = [
-  (id, f) => 'https://' + mcPath(id, f),                                   /* 1) https 직접 */
-  (id, f) => 'http://' + mcPath(id, f),                                    /* 2) http 직접 (file:// 등) */
-  (id, f) => 'https://wsrv.nl/?url=' + encodeURIComponent(mcPath(id, f))   /* 3) 이미지 프록시 경유 */
-];
-let MC_BASE = null;
+/* ---------- 매물 사진 자동 연결 (홈페이지 photos 폴더) ---------- */
 function mcTry(url) {
   return new Promise(res => {
     const im = new Image();
-    im.referrerPolicy = 'no-referrer';
-    const t = setTimeout(() => res(false), 10000);
+    const t = setTimeout(() => res(false), 8000);
     im.onload = () => { clearTimeout(t); res(true); };
     im.onerror = () => { clearTimeout(t); res(false); };
     im.src = url;
   });
 }
-async function mcDiscover(id) {
-  for (const b of MC_BUILDERS) {
-    for (const sfx of MC_SUFFIXES) {
-      if (await mcTry(b(id, id + '_1' + sfx + '.jpg'))) return { b, sfx };
-    }
-  }
-  return null;
-}
 async function mcFillCar(c) {
-  const id = Number(c.id.slice(2));
+  const id = c.id.slice(2);
   const list = [];
   let miss = 0;
   for (let n = 1; n <= 15 && miss < 2; n++) {
-    const ok = await mcTry(MC_BASE.b(id, id + '_' + n + '_76.jpg'));
-    if (ok) { list.push(MC_BASE.b(id, id + '_' + n + MC_BASE.sfx + '.jpg')); miss = 0; }
+    const url = 'photos/' + id + '_' + n + '.jpg';
+    if (await mcTry(url)) { list.push(url); miss = 0; }
     else miss++;
   }
   if (list.length) { c.photos = list; try { await saveCar(c); } catch (e) {} }
@@ -1781,17 +1764,9 @@ async function mcFillCar(c) {
 async function mcInitPhotos() {
   const mcCars = cars.filter(c => typeof c.id === 'string' && /^mc\d+$/.test(c.id) && (!c.photos || !c.photos.length));
   if (!mcCars.length) return;
-  MC_BASE = await mcDiscover(Number(mcCars[0].id.slice(2)));
-  if (!MC_BASE) { console.warn('몰던카 사진 서버에 연결하지 못했습니다'); return; }
   await Promise.all(mcCars.map(c => mcFillCar(c)));
   render();
 }
-document.addEventListener('error', e => {
-  const im = e.target;
-  if (im && im.tagName === 'IMG' && /car_img2/.test(im.src) && !/_76\.jpg$/.test(im.src)) {
-    im.src = im.src.replace(/(_\d+)(?:_\d+)?\.jpg$/, '$1_76.jpg');
-  }
-}, true);
 
 (async () => { await loadAll(); render(); mcInitPhotos(); })();
 </script>
