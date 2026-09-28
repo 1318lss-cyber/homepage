@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><title>두드림모터스 후기 관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="styles.css?v=20260929"><link rel="stylesheet" href="admin.css?v=20260929">
+</head>
+<body class="admin-page">
+  <header class="admin-header"><div class="wrap"><a class="brand" href="index.html"><span class="brand-mark">D</span><span>두드림모터스</span></a><a href="index.html">홈페이지 보기</a></div></header>
+  <main class="admin-main wrap">
+    <section id="loginPanel" class="admin-card login-card"><span class="kicker">ADMIN</span><h1>거래 후기 관리</h1><p>관리자 계정으로 로그인하세요.</p><form id="loginForm"><label>이메일<input name="email" type="email" required></label><label>비밀번호<input name="password" type="password" required></label><p id="loginStatus" class="form-status"></p><button class="button primary" type="submit">로그인</button></form></section>
+    <section id="managePanel" hidden><div class="admin-title"><div><span class="kicker">REVIEW MANAGEMENT</span><h1>고객 후기 관리</h1><p>대기 중인 글을 확인하고 공개, 수정 또는 삭제할 수 있습니다.</p></div><button id="logoutButton" class="button outline" type="button">로그아웃</button></div><div class="admin-tabs"><button class="active" data-filter="all">전체</button><button data-filter="pending">승인 대기</button><button data-filter="published">공개</button></div><div id="adminReviewList" class="admin-review-list"></div></section>
+  </main>
+  <dialog id="editDialog" class="review-dialog"><button class="dialog-close edit-close" type="button" aria-label="닫기">×</button><form id="editForm" class="review-form"><h2>후기 수정</h2><input name="id" type="hidden"><label><span>작성자</span><input name="author" required maxlength="20"></label><label><span>거래 차량</span><input name="vehicle" required maxlength="50"></label><label><span>제목</span><input name="title" required maxlength="60"></label><label><span>내용</span><textarea name="content" required maxlength="1000"></textarea></label><label><span>공개 상태</span><select name="status"><option value="pending">승인 대기</option><option value="published">공개</option></select></label><p id="editStatus" class="form-status"></p><button class="button primary" type="submit">저장하기</button></form></dialog>
+  <script type="module" src="admin.js?v=20260929"></script>
+</body>
+</html>
