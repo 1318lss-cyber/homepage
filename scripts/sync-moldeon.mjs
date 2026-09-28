@@ -1,7 +1,9 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-const ROOT = "http://moldeoncar.com";
+const API_ROOT = "https://encode.moldeoncar.com/api";
+// 몰던카 웹앱이 공개 조회에 사용하는 브라우저용 키입니다.
+const API_KEY = process.env.MOLDEON_API_KEY || "22227bbf-66ad-4196-aa43-e50056411aa5";
 const dealerId = process.env.MOLDEON_CONTACT_ID?.trim();
 const outputPath = resolve(process.env.OUTPUT_PATH || "data/cars.json");
 const concurrency = Math.max(1, Math.min(6, Number(process.env.SYNC_CONCURRENCY || 4)));
@@ -10,90 +12,76 @@ if (!dealerId || !/^\d+$/.test(dealerId)) {
   throw new Error("MOLDEON_CONTACT_ID에 몰던카 판매자 미니홈피의 contactID 숫자를 설정하세요.");
 }
 
-function decodeEntities(value = "") {
-  const entities = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", nbsp: " " };
-  return value
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/&([a-z]+);/gi, (_, name) => entities[name.toLowerCase()] ?? `&${name};`);
-}
-
-function text(value = "") {
-  return decodeEntities(value.replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, " "))
-    .replace(/[\t\r ]+/g, " ").replace(/ *\n */g, "\n").trim();
-}
-
-async function fetchLegacy(path) {
-  const response = await fetch(new URL(path, ROOT), {
-    headers: { "user-agent": "DodreamMotorsInventorySync/1.0 (+https://dodreamcar.com/)" },
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`${path} 요청 실패: HTTP ${response.status}`);
-  return new TextDecoder("euc-kr").decode(await response.arrayBuffer());
-}
-
-function managerPagePath(page) {
-  return page === 0
-    ? `/manager/?contactID=${dealerId}`
-    : `/manager/default.asp?grp=0&page=${page}&contactID=${dealerId}`;
+async function fetchApi(path, attempt = 1) {
+  try {
+    const response = await fetch(new URL(path.replace(/^\//, ""), `${API_ROOT}/`), {
+      headers: {
+        "x-api-key": API_KEY,
+        "user-agent": "DodreamMotorsInventorySync/2.0 (+https://dodreamcar.com/)",
+      },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const body = await response.json();
+    if (body.status !== "OK") throw new Error(`몰던카 응답 상태: ${body.status || "알 수 없음"}`);
+    return body.data;
+  } catch (error) {
+    if (attempt < 3) {
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, attempt * 1_500));
+      return fetchApi(path, attempt + 1);
+    }
+    throw new Error(`${path} 요청 실패: ${error.message}`, { cause: error });
+  }
 }
 
 async function collectCarIds() {
-  const first = await fetchLegacy(managerPagePath(0));
-  const title = text(first.match(/<title>([\s\S]*?)<\/title>/i)?.[1]);
-  if (!title || !first.includes(`contactID=${dealerId}`)) throw new Error("판매자 미니홈피를 확인할 수 없습니다. contactID를 확인하세요.");
-  const pageNumbers = [...first.matchAll(/page=(\d+)&(?:amp;)?contactID=/gi)].map((match) => Number(match[1]));
-  const maxPage = Math.max(0, ...pageNumbers);
-  const pages = [first];
-  for (let page = 1; page <= maxPage; page += 1) pages.push(await fetchLegacy(managerPagePath(page)));
-  const ids = new Set();
-  for (const html of pages) {
-    for (const match of html.matchAll(/usedCarID=(\d+)/gi)) ids.add(match[1]);
+  const itemCount = 30;
+  const first = await fetchApi(`/home/seller.mdc?id=${dealerId}&page=1&itemCount=${itemCount}&keyword=`);
+  const ids = first.list.map((car) => String(car.id));
+  const pages = Math.ceil(first.total / itemCount);
+  for (let page = 2; page <= pages; page += 1) {
+    const result = await fetchApi(`/home/seller.mdc?id=${dealerId}&page=${page}&itemCount=${itemCount}&keyword=`);
+    ids.push(...result.list.map((car) => String(car.id)));
   }
-  return { ids: [...ids], dealerTitle: title.replace(/^몰던카-/, "").replace(/\s*홈$/, "") };
+  return [...new Set(ids)];
 }
 
-function infoMap(html) {
-  const table = html.match(/<table[^>]+id=["']info["'][^>]*>([\s\S]*?)<\/table>/i)?.[1] || "";
-  const cells = [...table.matchAll(/<(th|td)\b[^>]*>([\s\S]*?)<\/\1>/gi)].map((match) => ({ type: match[1].toLowerCase(), value: text(match[2]) }));
-  const result = {};
-  for (let index = 0; index < cells.length; index += 1) {
-    if (cells[index].type === "th" && cells[index + 1]?.type === "td") result[cells[index].value] = cells[index + 1].value;
-  }
-  return result;
+function fuelName(code) {
+  return ({
+    0: "알 수 없음", 1: "가솔린", 2: "디젤", 3: "LPG", 4: "가솔린/LPG",
+    5: "CNG", 6: "하이브리드", 7: "전기/LPG", 8: "가솔린/CNG",
+    9: "전기", 10: "수소", 11: "전기/디젤",
+  })[code] || "기타";
 }
 
-function absolute(path) {
-  if (!path) return "";
-  const decoded = decodeEntities(path);
-  const origin = /^\/(?:car_img2|files)\//i.test(decoded) ? "https://encode.moldeoncar.com" : ROOT;
-  return new URL(decoded, origin).href;
+function transmissionName(code) {
+  return ({ 0: "알 수 없음", 1: "오토", 2: "수동", 3: "세미오토", 4: "CVT" })[code] || "기타";
 }
 
-function parseDetail(id, html) {
-  const heading = text(html.match(/<div[^>]+id=["']uc_title["'][^>]*>[\s\S]*?<p>([\s\S]*?)<\/p>/i)?.[1]);
-  const [brand = "", ...nameParts] = heading.split(/\s+-\s+/);
-  const fullName = nameParts.join(" - ");
-  const model = fullName.match(/^(.+?)(?=\s+(?:\d|[A-Z]\d|디젤|가솔린|LPI|LPG|EV|하이브리드))/)?.[1] || fullName;
-  const trim = fullName.slice(model.length).trim();
-  const info = infoMap(html);
-  const photos = [...new Set([...html.matchAll(/<img[^>]+class=["'][^"']*\bphoto\b[^"']*["'][^>]+rel=["']([^"']+)["']/gi)].map((match) => absolute(match[1])))];
-  if (!photos.length) {
-    const main = html.match(/id=["']photo_01["'][^>]+src=["']([^"'?]+)/i)?.[1];
-    if (main) photos.push(absolute(main));
-  }
-  const priceText = text(html.match(/<div[^>]+id=["']uc_price["'][^>]*>([\s\S]*?)<\/div>/i)?.[1]);
-  const year = Number(info["연식"]?.match(/(\d{4})/)?.[1] || 0);
-  const mileage = Number((info["주행거리"]?.match(/[\d,]+/)?.[0] || "0").replaceAll(",", ""));
-  const price = Number((priceText.match(/[\d,]+\s*만원/)?.[0] || "0").replace(/[^\d]/g, ""));
-  const registeredAt = text(html.match(/등록일:\s*([^,<]+)/i)?.[1]);
-  const memo = text(html.match(/<p[^>]+class=["']cmem["'][^>]*>([\s\S]*?)<\/p>/i)?.[1]);
-  const inspection = html.match(/href=["']([^"']*(?:cklist|check)[^"']*)["'][^>]*checked/i)?.[1];
+function normalizeDetail(detail) {
+  const price = detail.price || {};
   return {
-    id, brand, model, trim, fullName, year, registeredAt, price, mileage,
-    fuel: info["연료"] || "", transmission: info["변속기"] || "", color: info["색상"] || "",
-    accident: info["사고이력"] || "", location: info["보관장소"] || "광주", vehicleNumber: info["차량번호"] || "",
-    memo, photos, sourceUrl: `https://app.mdcar.biz/#/ad/${id}`,
-    inspectionUrl: inspection ? new URL(decodeEntities(inspection), `${ROOT}/usedCar/`).href : "",
+    id: String(detail.id),
+    brand: detail.brand || "",
+    model: detail.model || "",
+    trim: detail.clss || "",
+    fullName: [detail.model, detail.clss].filter(Boolean).join(" "),
+    year: Number(detail.date_model || 0),
+    registeredAt: detail.date_reg || "",
+    price: Number(price.price || 0),
+    mileage: Number(detail.mileage || 0),
+    fuel: fuelName(String(detail.fuel)),
+    transmission: transmissionName(String(detail.trans)),
+    color: detail.color || "",
+    accident: detail.accident ? "있음" : "무사고",
+    location: detail.user?.xname
+      ? `${detail.user.xname}${detail.zone ? ` (${detail.zone})` : ""}`
+      : (detail.zone || "광주"),
+    vehicleNumber: detail.no || "",
+    memo: detail.memo || detail.memo_s || "등록된 상세설명이 없습니다.",
+    photos: Array.isArray(detail.photo) ? detail.photo.filter(Boolean) : [],
+    sourceUrl: `https://app.mdcar.biz/#/ad/${detail.id}`,
+    inspectionUrl: detail.check?.value || "",
   };
 }
 
@@ -110,11 +98,32 @@ async function mapConcurrent(items, workerCount, worker) {
   return output;
 }
 
-const { ids, dealerTitle } = await collectCarIds();
-const cars = await mapConcurrent(ids, concurrency, async (id) => parseDetail(id, await fetchLegacy(`/usedCar/detail.asp?usedCarID=${id}`)));
-const payload = { source: "moldeoncar", dealerId, dealerTitle, syncedAt: new Date().toISOString(), count: cars.length, cars };
+const ids = await collectCarIds();
+const details = await mapConcurrent(ids, concurrency, async (id) => {
+  const data = await fetchApi(`/ad/detail.mdc?id=${id}&zid=`);
+  return { ...data, id };
+});
+const cars = details.map(normalizeDetail);
+const dealerTitle = details[0]?.user?.name || dealerId;
+
+let previous;
+try {
+  previous = JSON.parse(await readFile(outputPath, "utf8"));
+} catch {
+  previous = undefined;
+}
+const sameInventory = previous
+  && previous.dealerId === dealerId
+  && JSON.stringify(previous.cars) === JSON.stringify(cars);
+const payload = {
+  source: "moldeoncar-api",
+  dealerId,
+  dealerTitle,
+  syncedAt: sameInventory ? previous.syncedAt : new Date().toISOString(),
+  count: cars.length,
+  cars,
+};
+
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 console.log(`몰던카 ${dealerTitle}: 차량 ${cars.length}대를 ${outputPath}에 저장했습니다.`);
-
-
