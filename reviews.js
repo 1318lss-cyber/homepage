@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebas
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import { addDoc, collection, getFirestore, limit, onSnapshot, query, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
-import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
+import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js?v=20260928-1";
 
 const $ = (selector) => document.querySelector(selector);
 const dialog = $("#reviewDialog");
