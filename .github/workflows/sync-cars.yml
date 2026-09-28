@@ -1,42 +1,14 @@
-name: 몰던카 차량 자동 동기화
+name: 몰던카 연동 설정 확인
 
 on:
-  schedule:
-    - cron: "17,47 * * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: moldeoncar-sync
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  sync:
+  verify:
     runs-on: ubuntu-latest
     steps:
-      - name: 저장소 받기
-        uses: actions/checkout@v4
-
-      - name: Node.js 설정
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: 이성신 판매자 매물 동기화
-        env:
-          MOLDEON_CONTACT_ID: "65818"
-        run: node scripts/sync-moldeon.mjs
-
-      - name: 변경된 차량 데이터 배포
-        run: |
-          if git diff --quiet -- data/cars.json; then
-            echo "변경된 매물이 없습니다."
-            exit 0
-          fi
-          git config user.name "dodreamcar-sync-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/cars.json
-          git commit -m "자동 동기화: 몰던카 매물 갱신"
-          git push
+      - name: 연동 방식 안내
+        run: echo "dodreamcar.com 방문자의 브라우저가 몰던카 HTTPS API에서 최신 매물을 직접 불러오며, 열린 화면은 30분마다 갱신됩니다."
