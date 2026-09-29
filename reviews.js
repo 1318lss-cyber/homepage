@@ -39,7 +39,7 @@ async function initializeReviews() {
   }
   const app = initializeApp(firebaseConfig);
   services = { auth:getAuth(app), db:getFirestore(app), storage:getStorage(app) };
-  await signInAnonymously(services.auth);
+  
   const reviewsQuery = query(collection(services.db, "reviews"), where("status", "==", "published"), limit(50));
   onSnapshot(reviewsQuery, (snapshot) => {
     const reviews = snapshot.docs
