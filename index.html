@@ -113,7 +113,7 @@
       <div class="form-grid"><label><span>작성자</span><input name="author" maxlength="20" required placeholder="성함 또는 닉네임"></label><label><span>거래 차량</span><input name="vehicle" maxlength="50" required placeholder="예: 그랜저 IG 판매"></label></div>
       <label><span>후기 제목</span><input name="title" maxlength="60" required placeholder="거래 경험을 한 문장으로 알려주세요"></label>
       <label><span>후기 내용</span><textarea name="content" maxlength="1000" required placeholder="상담부터 차량 인도까지의 경험을 자유롭게 남겨주세요"></textarea></label>
-      <label><span>사진 첨부 (최대 5MB)</span><input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
+        <label><span>사진 첨부 (최대 5MB)</span><input name="photo" type="file" accept="image/jpeg,image/png,image/webp"></label>
       <label class="consent"><input name="consent" type="checkbox" required><span>후기와 첨부 사진이 홈페이지에 공개되는 것에 동의합니다.</span></label>
       <p id="reviewStatus" class="form-status" role="status"></p><button class="button primary" type="submit">후기 등록하기</button>
     </form>
@@ -122,7 +122,7 @@
   <template id="carTemplate"><article class="car-card"><button class="card-open" type="button"><div class="car-photo"><img loading="lazy" alt=""><span class="photo-count"></span><span class="badge">실매물</span></div><div class="car-body"><p class="car-brand"></p><h3 class="car-name"></h3><p class="car-spec"></p><p class="car-price"></p></div></button></article></template>
   <template id="reviewTemplate"><article class="review-card"><img class="review-photo" alt="고객 거래 후기 사진" hidden><div class="review-body"><div class="review-meta"><span class="review-vehicle"></span><time></time></div><h3></h3><p class="review-content"></p><strong class="review-author"></strong></div></article></template>
 
-  <script src="app.js?v=20260929-1" defer></script>
+  <script type="module" src="app.js?v=20260929-2"></script>
   <script type="module" src="reviews.js?v=20260929-1"></script>
 </body>
 </html>

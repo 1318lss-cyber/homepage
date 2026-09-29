@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import { addDoc, collection, getFirestore, limit, onSnapshot, query, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js?v=20260928-1";
@@ -39,7 +39,6 @@ async function initializeReviews() {
   }
   const app = initializeApp(firebaseConfig);
   services = { auth:getAuth(app), db:getFirestore(app), storage:getStorage(app) };
-  
   const reviewsQuery = query(collection(services.db, "reviews"), where("status", "==", "published"), limit(50));
   onSnapshot(reviewsQuery, (snapshot) => {
     const reviews = snapshot.docs

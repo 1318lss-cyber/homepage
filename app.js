@@ -1,4 +1,8 @@
-const state = { all: [], filtered: [], current: null, visibleCount: 24 };
+import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { collection, getDocs, getFirestore } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js?v=20260929-1";
+
+const state = { all: [], filtered: [], current: null, visibleCount: 24, overrides: new Map() };
 const $ = (selector) => document.querySelector(selector);
 const fmt = (value) => Number(value || 0).toLocaleString("ko-KR");
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#39;", '"':"&quot;" })[char]);
@@ -13,6 +17,26 @@ const SEARCH_BODY = {
 };
 const fuelName = (code) => ({ 0:"알 수 없음", 1:"가솔린", 2:"디젤", 3:"LPG", 4:"가솔린/LPG", 5:"CNG", 6:"하이브리드", 7:"전기/LPG", 8:"가솔린/CNG", 9:"전기", 10:"수소", 11:"전기/디젤" })[code] || "기타";
 const transmissionName = (code) => ({ 0:"알 수 없음", 1:"오토", 2:"수동", 3:"세미오토", 4:"CVT" })[code] || "기타";
+
+function applyOverride(car) {
+  const override = state.overrides.get(String(car.id));
+  if (!override) return car;
+  if (Number.isFinite(Number(override.price)) && Number(override.price) >= 0) car.price = Number(override.price);
+  if (typeof override.description === "string") car.memo = override.description;
+  return car;
+}
+
+async function loadOverrides() {
+  state.overrides = new Map();
+  if (!isFirebaseConfigured()) return;
+  try {
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const snapshot = await getDocs(collection(getFirestore(app), "carOverrides"));
+    snapshot.forEach((document) => state.overrides.set(document.id, document.data()));
+  } catch (error) {
+    console.warn("차량 수정값을 불러오지 못했습니다.", error);
+  }
+}
 
 async function api(path, options = {}) {
   const response = await fetch(`${API_ROOT}${path}`, {
@@ -61,8 +85,10 @@ async function fetchCompanyCars() {
 
 async function loadCars() {
   $("#syncStatus").textContent = "두드림모터스 전체 실매물을 확인하고 있습니다…";
+  await loadOverrides();
   try {
     state.all = await fetchCompanyCars();
+    state.all.forEach(applyOverride);
     $("#syncStatus").textContent = `전체 실매물 최신 확인 · ${new Date().toLocaleString("ko-KR")}`;
   } catch (error) {
     try {
@@ -70,6 +96,7 @@ async function loadCars() {
       if (!response.ok) throw new Error();
       const payload = await response.json();
       state.all = Array.isArray(payload.cars) ? payload.cars : [];
+      state.all.forEach(applyOverride);
       $("#syncStatus").textContent = "연결 지연 · 저장된 최근 매물을 표시합니다";
     } catch {
       $("#syncStatus").textContent = error.message;
@@ -170,6 +197,7 @@ async function openDetail(car) {
   if (car.detailLoaded) return;
   try {
     mergeDetail(car, await api(`/ad/detail.mdc?id=${car.id}&zid=`));
+    applyOverride(car);
     if (state.current === car) renderDetail(car);
   } catch {
     const loading = $(".detail-loading");

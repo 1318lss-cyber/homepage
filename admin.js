@@ -1,8 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { collection, deleteDoc, doc, getFirestore, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { deleteObject, getStorage, ref } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
-import { adminEmail, firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
+import { adminEmail, firebaseConfig, isFirebaseConfigured } from "./firebase-config.js?v=20260928-1";
 
 const $ = (selector) => document.querySelector(selector);
 let auth;
@@ -10,6 +10,10 @@ let db;
 let storage;
 let reviews = [];
 let filter = "all";
+let cars = [];
+let carOverrides = new Map();
+let currentCar;
+const fmt = (value) => Number(value || 0).toLocaleString("ko-KR");
 
 function escapeHtml(value = "") {
   return String(value).replace(/[&<>'"]/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#39;", '"':"&quot;" })[char]);
@@ -34,6 +38,46 @@ function openEdit(review) {
   $("#editDialog").showModal();
 }
 
+function renderCars() {
+  const queryText = $("#carAdminSearch").value.trim().toLowerCase();
+  const items = cars.filter((car) => `${car.id} ${car.brand} ${car.model} ${car.trim}`.toLowerCase().includes(queryText));
+  $("#carAdminCount").textContent = `${items.length}대`;
+  $("#adminCarList").innerHTML = items.map((car) => {
+    const override = carOverrides.get(String(car.id));
+    const price = override?.price ?? car.price;
+    const description = override && Object.hasOwn(override, "description") ? override.description : car.memo;
+    return `<article class="admin-car" data-id="${escapeHtml(car.id)}">
+      <img src="${escapeHtml(car.photos?.[0] || "")}" alt="${escapeHtml(car.model)}">
+      <div><small>${escapeHtml(car.brand)} · 매물번호 ${escapeHtml(car.id)}${override ? '<span class="override-badge">수정됨</span>' : ""}</small><h3>${escapeHtml([car.model, car.trim].filter(Boolean).join(" "))}</h3><p class="car-admin-price">${fmt(price)}만원</p><p>${escapeHtml(description || "등록된 설명이 없습니다.")}</p></div>
+      <button data-action="edit-car" type="button">가격·설명 수정</button>
+    </article>`;
+  }).join("") || '<div class="admin-empty">검색 조건에 맞는 차량이 없습니다.</div>';
+}
+
+async function loadAdminCars() {
+  try {
+    const response = await fetch(`data/cars.json?v=${Date.now()}`, { cache:"no-store" });
+    const payload = await response.json();
+    cars = Array.isArray(payload.cars) ? payload.cars : [];
+    renderCars();
+  } catch {
+    $("#adminCarList").innerHTML = '<div class="admin-empty">차량 목록을 불러오지 못했습니다.</div>';
+  }
+}
+
+function openCarEdit(car) {
+  currentCar = car;
+  const override = carOverrides.get(String(car.id));
+  const form = $("#carEditForm");
+  form.elements.id.value = car.id;
+  form.elements.price.value = override?.price ?? car.price;
+  form.elements.description.value = override && Object.hasOwn(override, "description") ? override.description : (car.memo || "");
+  $("#carEditName").textContent = `${car.brand} ${[car.model, car.trim].filter(Boolean).join(" ")} · 매물번호 ${car.id}`;
+  $("#carEditStatus").textContent = "";
+  $("#carOverrideReset").hidden = !override;
+  $("#carEditDialog").showModal();
+}
+
 async function initializeAdmin() {
   if (!isFirebaseConfigured()) { $("#loginStatus").textContent = "Firebase 설정과 관리자 이메일 등록이 필요합니다."; return; }
   const app = initializeApp(firebaseConfig);
@@ -47,6 +91,11 @@ async function initializeAdmin() {
       reviews = snapshot.docs.map((document) => ({ id:document.id, ...document.data() }));
       render();
     });
+    window.carOverrideUnsubscribe = onSnapshot(collection(db, "carOverrides"), (snapshot) => {
+      carOverrides = new Map(snapshot.docs.map((document) => [document.id, document.data()]));
+      renderCars();
+    });
+    loadAdminCars();
   });
 }
 
@@ -63,6 +112,13 @@ $("#loginForm").addEventListener("submit", async (event) => {
 });
 
 $("#logoutButton").addEventListener("click", () => signOut(auth));
+$(".admin-main-tabs").addEventListener("click", (event) => {
+  const button = event.target.closest("button"); if (!button) return;
+  document.querySelectorAll(".admin-main-tabs button").forEach((item) => item.classList.remove("active"));
+  button.classList.add("active");
+  $("#reviewManager").hidden = button.dataset.view !== "reviews";
+  $("#carManager").hidden = button.dataset.view !== "cars";
+});
 $(".admin-tabs").addEventListener("click", (event) => {
   const button = event.target.closest("button"); if (!button) return;
   document.querySelectorAll(".admin-tabs button").forEach((item) => item.classList.remove("active"));
@@ -95,5 +151,34 @@ $("#editForm").addEventListener("submit", async (event) => {
   } catch { $("#editStatus").textContent = "저장하지 못했습니다. 잠시 후 다시 시도해 주세요."; }
 });
 $(".edit-close").addEventListener("click", () => $("#editDialog").close());
+
+$("#carAdminSearch").addEventListener("input", renderCars);
+$("#adminCarList").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-action=edit-car]");
+  const card = event.target.closest(".admin-car");
+  if (!button || !card) return;
+  const car = cars.find((item) => String(item.id) === card.dataset.id);
+  if (car) openCarEdit(car);
+});
+$("#carEditForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  const price = Number(data.get("price"));
+  if (!Number.isInteger(price) || price < 0 || price > 99999) { $("#carEditStatus").textContent = "가격을 만원 단위 숫자로 입력해 주세요."; return; }
+  $("#carEditStatus").textContent = "저장 중…";
+  try {
+    await setDoc(doc(db, "carOverrides", String(data.get("id"))), {
+      price, description:String(data.get("description")).trim(), updatedAt:serverTimestamp(), updatedBy:auth.currentUser.email,
+    });
+    $("#carEditDialog").close();
+  } catch { $("#carEditStatus").textContent = "저장하지 못했습니다. 잠시 후 다시 시도해 주세요."; }
+});
+$("#carOverrideReset").addEventListener("click", async () => {
+  if (!currentCar || !window.confirm("이 차량의 수정 가격과 설명을 삭제하고 연동된 원본 정보로 되돌리시겠습니까?")) return;
+  $("#carEditStatus").textContent = "원본으로 되돌리는 중…";
+  try { await deleteDoc(doc(db, "carOverrides", String(currentCar.id))); $("#carEditDialog").close(); }
+  catch { $("#carEditStatus").textContent = "원본으로 되돌리지 못했습니다."; }
+});
+$(".car-edit-close").addEventListener("click", () => $("#carEditDialog").close());
 
 initializeAdmin();
