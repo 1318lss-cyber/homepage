@@ -18,3 +18,5 @@
 .nav nav{gap:20px}.nav nav a{font-size:13px}@media(max-width:850px){.local-guide-grid{grid-template-columns:1fr}.guide-hero{padding:65px 0}.guide-checklist li{grid-template-columns:1fr;gap:6px}}
 @media(max-width:560px){.local-guide-section{padding:60px 0}.guide-hero>div>p:not(.eyebrow){font-size:15px}.guide-article{padding-top:45px}.guide-author{align-items:flex-start}.guide-article h2{font-size:27px}.guide-steps{grid-template-columns:1fr}.guide-cta{padding:30px 22px}.guide-cta>div{flex-direction:column}}
 
+.detail-actions button{padding:12px 17px;border:0;border-radius:999px;font:inherit;font-weight:800;font-size:13px;background:var(--green);color:#fff;cursor:pointer}.detail-actions button.secondary{background:var(--paper);color:var(--green)}.share-status{min-height:20px;margin:10px 0 0;color:var(--green);font-size:12px}.share-status a{text-decoration:underline;overflow-wrap:anywhere}
+

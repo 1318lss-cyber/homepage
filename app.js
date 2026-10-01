@@ -2,10 +2,11 @@ import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebase
 import { collection, getDocs, getFirestore } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js?v=20260929-1";
 
-const state = { all: [], filtered: [], current: null, visibleCount: 24, overrides: new Map() };
+const state = { all: [], filtered: [], current: null, visibleCount: 24, overrides: new Map(), suppressUrlSync: false };
 const $ = (selector) => document.querySelector(selector);
 const fmt = (value) => Number(value || 0).toLocaleString("ko-KR");
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#39;", '"':"&quot;" })[char]);
+const normalizeSearch = (value = "") => String(value).toLowerCase().replace(/[\s-]/g, "");
 const API_ROOT = "https://encode.moldeoncar.com/api";
 const API_KEY = "22227bbf-66ad-4196-aa43-e50056411aa5";
 const COMPANY_ID = "1321";
@@ -17,6 +18,8 @@ const SEARCH_BODY = {
 };
 const fuelName = (code) => ({ 0:"알 수 없음", 1:"가솔린", 2:"디젤", 3:"LPG", 4:"가솔린/LPG", 5:"CNG", 6:"하이브리드", 7:"전기/LPG", 8:"가솔린/CNG", 9:"전기", 10:"수소", 11:"전기/디젤" })[code] || "기타";
 const transmissionName = (code) => ({ 0:"알 수 없음", 1:"오토", 2:"수동", 3:"세미오토", 4:"CVT" })[code] || "기타";
+let vehicleSearchTimer;
+let vehicleSearchSerial = 0;
 
 function applyOverride(car) {
   const override = state.overrides.get(String(car.id));
@@ -55,7 +58,7 @@ function normalizeList(car) {
     fullName:[car.model, car.clss].filter(Boolean).join(" "), year:Number(car.year || 0), registeredAt:car.reg || "",
     price:Number(car.price || 0), mileage:Number(car.mileage || 0), fuel:fuelName(String(car.fuel)),
     transmission:transmissionName(String(car.trans)), color:"", accident:"상세 확인", location:car.sido || "광주 서구",
-    vehicleNumber:"", memo:car.memo || "", photos:car.photo ? [car.photo] : [],
+    vehicleNumber:car.no || car.carNo || car.vehicleNumber || "", memo:car.memo || "", photos:car.photo ? [car.photo] : [],
     inspectionUrl:"", detailLoaded:false,
   };
 }
@@ -106,6 +109,7 @@ async function loadCars() {
   }
   populateFilters();
   applyFilters();
+  openDetailFromUrl();
 }
 
 function populateFilters() {
@@ -119,13 +123,16 @@ function populateFilters() {
 }
 
 function applyFilters() {
+  window.clearTimeout(vehicleSearchTimer);
+  const searchSerial = ++vehicleSearchSerial;
   state.visibleCount = 24;
-  const query = $("#query").value.trim().toLowerCase();
+  const rawQuery = $("#query").value.trim();
+  const query = normalizeSearch(rawQuery);
   const brand = $("#brandFilter").value;
   const fuel = $("#fuelFilter").value;
   const sort = $("#sortFilter").value;
   const list = state.all.filter((car) => {
-    const haystack = `${car.brand} ${car.model} ${car.trim} ${car.memo}`.toLowerCase();
+    const haystack = normalizeSearch(`${car.brand} ${car.model} ${car.trim} ${car.memo} ${car.vehicleNumber} ${car.id}`);
     return (!query || haystack.includes(query)) && (!brand || car.brand === brand) && (!fuel || car.fuel === fuel);
   });
   const sorters = {
@@ -134,6 +141,29 @@ function applyFilters() {
   };
   state.filtered = list.sort(sorters[sort]);
   renderVisible();
+  if (query && /\d/.test(query) && list.length === 0) {
+    vehicleSearchTimer = window.setTimeout(() => searchVehicleNumber(rawQuery, { brand, fuel, sort, searchSerial }), 350);
+  }
+}
+
+async function searchVehicleNumber(query, { brand, fuel, sort, searchSerial }) {
+  try {
+    const result = await api("/search/", {
+      method:"POST",
+      body:JSON.stringify({ ...SEARCH_BODY, keyword:query, page:1 }),
+    });
+    if (searchSerial !== vehicleSearchSerial || normalizeSearch($("#query").value) !== normalizeSearch(query)) return;
+    const matches = result.list.map((item) => state.all.find((car) => String(car.id) === String(item.id)) || normalizeList(item));
+    const filtered = matches.filter((car) => (!brand || car.brand === brand) && (!fuel || car.fuel === fuel));
+    const sorters = {
+      new:(a,b) => String(b.id).localeCompare(String(a.id)), priceAsc:(a,b) => a.price - b.price,
+      priceDesc:(a,b) => b.price - a.price, mileage:(a,b) => a.mileage - b.mileage,
+    };
+    state.filtered = filtered.sort(sorters[sort]);
+    renderVisible();
+  } catch (error) {
+    console.warn("차량번호 검색을 완료하지 못했습니다.", error);
+  }
 }
 
 function renderVisible() {
@@ -177,10 +207,12 @@ function renderDetail(car, loading = false) {
           <div><span>연식</span><b>${escapeHtml(car.year)}년</b></div><div><span>주행거리</span><b>${fmt(car.mileage)}km</b></div>
           <div><span>연료</span><b>${escapeHtml(car.fuel)}</b></div><div><span>변속기</span><b>${escapeHtml(car.transmission)}</b></div>
           <div><span>색상</span><b>${escapeHtml(car.color || "상세 확인")}</b></div><div><span>사고이력</span><b>${escapeHtml(car.accident || "상담 문의")}</b></div>
-          <div><span>보관장소</span><b>${escapeHtml(car.location || "광주")}</b></div><div><span>매물번호</span><b>${escapeHtml(car.id)}</b></div>
+          <div><span>보관장소</span><b>${escapeHtml(car.location || "광주")}</b></div><div><span>차량번호</span><b>${escapeHtml(car.vehicleNumber || "상세 확인")}</b></div>
+          <div><span>매물번호</span><b>${escapeHtml(car.id)}</b></div>
         </div>
         ${car.memo ? `<p class="memo">${escapeHtml(car.memo)}</p>` : ""}
-        <div class="detail-actions"><a href="tel:01049439727">전화 상담</a><a href="sms:01049439727?body=${encodeURIComponent(`[두드림모터스] ${car.brand} ${car.model} 매물번호 ${car.id} 문의드립니다.`)}">문자 문의</a>${car.inspectionUrl ? `<a class="secondary" href="${escapeHtml(car.inspectionUrl)}" target="_blank" rel="noopener noreferrer">성능점검 보기</a>` : ""}</div>
+        <div class="detail-actions"><a href="tel:01049439727">전화 상담</a><a href="sms:01049439727?body=${encodeURIComponent(`[두드림모터스] ${car.brand} ${car.model} 매물번호 ${car.id} 문의드립니다.`)}">문자 문의</a><button class="share-detail secondary" type="button">차량 링크 공유</button>${car.inspectionUrl ? `<a class="secondary" href="${escapeHtml(car.inspectionUrl)}" target="_blank" rel="noopener noreferrer">성능점검 보기</a>` : ""}</div>
+        <p class="share-status" role="status" aria-live="polite"></p>
       </div>
     </div>`;
   $("#detailContent").querySelectorAll(".thumbs button").forEach((button) => button.addEventListener("click", () => {
@@ -188,12 +220,55 @@ function renderDetail(car, loading = false) {
     $("#detailContent").querySelectorAll(".thumbs button").forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
   }));
+  $("#detailContent .share-detail").addEventListener("click", () => shareCar(car));
 }
 
-async function openDetail(car) {
+function carUrl(car) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("car", car.id);
+  url.hash = "";
+  return url.toString();
+}
+
+function setCarUrl(car) {
+  const url = new URL(window.location.href);
+  if (url.searchParams.get("car") === String(car.id)) return;
+  url.searchParams.set("car", car.id);
+  url.hash = "";
+  window.history.pushState({ carId:car.id }, "", url);
+}
+
+function clearCarUrl() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("car")) return;
+  url.searchParams.delete("car");
+  window.history.replaceState({}, "", url);
+}
+
+async function shareCar(car) {
+  const url = carUrl(car);
+  const title = `${car.brand} ${car.model} ${car.trim}`.trim();
+  const status = $("#detailContent .share-status");
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text:`두드림모터스 ${title} 차량 정보`, url });
+      status.textContent = "차량 링크 공유 창을 열었습니다.";
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    status.textContent = "차량 링크를 복사했습니다. 문자나 카카오톡에 붙여넣으세요.";
+  } catch (error) {
+    if (error?.name !== "AbortError") {
+      status.innerHTML = `링크를 복사해 보내주세요: <a href="${escapeHtml(url)}">${escapeHtml(url)}</a>`;
+    }
+  }
+}
+
+async function openDetail(car, { updateUrl = true } = {}) {
   state.current = car;
   renderDetail(car, !car.detailLoaded);
-  $("#detailDialog").showModal();
+  if (!$("#detailDialog").open) $("#detailDialog").showModal();
+  if (updateUrl) setCarUrl(car);
   if (car.detailLoaded) return;
   try {
     mergeDetail(car, await api(`/ad/detail.mdc?id=${car.id}&zid=`));
@@ -205,10 +280,33 @@ async function openDetail(car) {
   }
 }
 
+function openDetailFromUrl() {
+  const carId = new URL(window.location.href).searchParams.get("car");
+  if (!carId) return;
+  const car = state.all.find((item) => String(item.id) === carId);
+  if (car && state.current !== car) openDetail(car, { updateUrl:false });
+}
+
+function closeDetail({ updateUrl = true } = {}) {
+  if (!$("#detailDialog").open) return;
+  state.suppressUrlSync = !updateUrl;
+  $("#detailDialog").close();
+}
+
 ["#query", "#brandFilter", "#fuelFilter", "#sortFilter"].forEach((id) => $(id).addEventListener(id === "#query" ? "input" : "change", applyFilters));
 $("#resetFilters").addEventListener("click", () => { $("#query").value = ""; $("#brandFilter").value = ""; $("#fuelFilter").value = ""; $("#sortFilter").value = "new"; applyFilters(); });
 $("#loadMore").addEventListener("click", () => { state.visibleCount += 24; renderVisible(); });
-$(".detail-dialog .dialog-close").addEventListener("click", () => $("#detailDialog").close());
-$("#detailDialog").addEventListener("click", (event) => { if (event.target === $("#detailDialog")) $("#detailDialog").close(); });
+$(".detail-dialog .dialog-close").addEventListener("click", () => closeDetail());
+$("#detailDialog").addEventListener("click", (event) => { if (event.target === $("#detailDialog")) closeDetail(); });
+$("#detailDialog").addEventListener("close", () => {
+  state.current = null;
+  if (state.suppressUrlSync) state.suppressUrlSync = false;
+  else clearCarUrl();
+});
+window.addEventListener("popstate", () => {
+  const carId = new URL(window.location.href).searchParams.get("car");
+  if (!carId) closeDetail({ updateUrl:false });
+  else openDetailFromUrl();
+});
 loadCars();
 setInterval(loadCars, 30 * 60 * 1000);

@@ -45,7 +45,7 @@ function normalize(car) {
     fullName:[car.model, car.clss].filter(Boolean).join(" "), year:Number(car.year || 0), registeredAt:car.reg || "",
     price:Number(car.price || 0), mileage:Number(car.mileage || 0), fuel:fuelName(String(car.fuel)),
     transmission:transmissionName(String(car.trans)), color:"", accident:"상세 확인", location:car.sido || "광주 서구",
-    vehicleNumber:"", memo:car.memo || "", photos:car.photo ? [car.photo] : [], inspectionUrl:"", detailLoaded:false,
+    vehicleNumber:car.no || car.carNo || car.vehicleNumber || "", memo:car.memo || "", photos:car.photo ? [car.photo] : [], inspectionUrl:"", detailLoaded:false,
   };
 }
 
