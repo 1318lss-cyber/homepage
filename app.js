@@ -16,6 +16,7 @@ const SEARCH_BODY = {
   company:[COMPANY_ID], color:[], spc:[], isNoAcc:false, isPrivate:false, isLease:false, isFixed:false,
   isAdminCheck:false, isOffPrice:false, itemCount:30, zid:"116", order:"modify",
 };
+const BACKUP_CARS_URL = "data/cars.json?v=20261018-1";
 const fuelName = (code) => ({ 0:"알 수 없음", 1:"가솔린", 2:"디젤", 3:"LPG", 4:"가솔린/LPG", 5:"CNG", 6:"하이브리드", 7:"전기/LPG", 8:"가솔린/CNG", 9:"전기", 10:"수소", 11:"전기/디젤" })[code] || "기타";
 const transmissionName = (code) => ({ 0:"알 수 없음", 1:"오토", 2:"수동", 3:"세미오토", 4:"CVT" })[code] || "기타";
 let vehicleSearchTimer;
@@ -78,38 +79,66 @@ function mergeDetail(car, detail) {
 
 async function fetchCompanyCars() {
   const first = await api("/search/", { method:"POST", body:JSON.stringify({ ...SEARCH_BODY, page:1 }) });
-  const cars = first.list.map(normalizeList);
-  for (let page = 2; page <= Math.ceil(first.total / SEARCH_BODY.itemCount); page += 1) {
-    const result = await api("/search/", { method:"POST", body:JSON.stringify({ ...SEARCH_BODY, page }) });
-    cars.push(...result.list.map(normalizeList));
-  }
-  return cars;
+  const pageCount = Math.ceil(first.total / SEARCH_BODY.itemCount);
+  const remainingPages = Array.from({ length:Math.max(0, pageCount - 1) }, (_, index) => index + 2);
+  const results = await Promise.all(remainingPages.map((page) => api("/search/", {
+    method:"POST",
+    body:JSON.stringify({ ...SEARCH_BODY, page }),
+  })));
+  return [first, ...results].flatMap((result) => result.list.map(normalizeList));
 }
 
-async function loadCars() {
-  $("#syncStatus").textContent = "두드림모터스 전체 실매물을 확인하고 있습니다…";
-  await loadOverrides();
-  try {
-    state.all = await fetchCompanyCars();
-    state.all.forEach(applyOverride);
-    $("#syncStatus").textContent = `전체 실매물 최신 확인 · ${new Date().toLocaleString("ko-KR")}`;
-  } catch (error) {
-    try {
-      const response = await fetch(`data/cars.json?v=${Date.now()}`, { cache:"no-store" });
-      if (!response.ok) throw new Error();
-      const payload = await response.json();
-      state.all = Array.isArray(payload.cars) ? payload.cars : [];
-      state.all.forEach(applyOverride);
-      $("#syncStatus").textContent = "연결 지연 · 저장된 최근 매물을 표시합니다";
-    } catch {
-      $("#syncStatus").textContent = error.message;
-      render([]);
-      return;
-    }
-  }
+async function fetchBackupCars() {
+  const response = await fetch(BACKUP_CARS_URL);
+  if (!response.ok) throw new Error("저장된 매물을 불러오지 못했습니다.");
+  const payload = await response.json();
+  return Array.isArray(payload.cars) ? payload.cars : [];
+}
+
+function displayCars(cars, status) {
+  state.all = cars;
+  state.all.forEach(applyOverride);
+  $("#syncStatus").textContent = status;
   populateFilters();
   applyFilters();
   openDetailFromUrl();
+}
+
+async function loadCars() {
+  $("#syncStatus").textContent = "저장된 최신 매물을 빠르게 불러오는 중…";
+  const overridesPromise = loadOverrides();
+  const livePromise = fetchCompanyCars()
+    .then((cars) => ({ ok:true, cars }))
+    .catch((error) => ({ ok:false, error }));
+  const backupPromise = fetchBackupCars()
+    .then((cars) => ({ ok:true, cars }))
+    .catch((error) => ({ ok:false, error }));
+
+  const first = await Promise.race([backupPromise, livePromise]);
+  if (first.ok && first.cars.length) {
+    displayCars(first.cars, "저장된 최신 매물 표시 · 실시간 정보 확인 중…");
+  }
+
+  const live = await livePromise;
+  await overridesPromise;
+  if (live.ok && live.cars.length) {
+    displayCars(live.cars, `전체 실매물 최신 확인 · ${new Date().toLocaleString("ko-KR")}`);
+    return;
+  }
+
+  if (!state.all.length) {
+    const backup = await backupPromise;
+    if (backup.ok && backup.cars.length) {
+      displayCars(backup.cars, "연결 지연 · 저장된 최근 매물을 표시합니다");
+      return;
+    }
+    $("#syncStatus").textContent = live.error?.message || "차량 정보를 불러오지 못했습니다.";
+    render([]);
+    return;
+  }
+  state.all.forEach(applyOverride);
+  applyFilters();
+  $("#syncStatus").textContent = "연결 지연 · 저장된 최근 매물을 표시합니다";
 }
 
 function populateFilters() {

@@ -50,12 +50,10 @@ function normalize(car) {
 }
 
 const first = await fetchPage(1);
-const cars = first.list.map(normalize);
 const pageCount = Math.ceil(first.total / searchBody.itemCount);
-for (let page = 2; page <= pageCount; page += 1) {
-  const result = await fetchPage(page);
-  cars.push(...result.list.map(normalize));
-}
+const remainingPages = Array.from({ length:Math.max(0, pageCount - 1) }, (_, index) => index + 2);
+const results = await Promise.all(remainingPages.map(fetchPage));
+const cars = [first, ...results].flatMap((result) => result.list.map(normalize));
 
 let previous;
 try { previous = JSON.parse(await readFile(outputPath, "utf8")); } catch { previous = undefined; }
