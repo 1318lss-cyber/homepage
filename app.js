@@ -16,7 +16,7 @@ const SEARCH_BODY = {
   company:[COMPANY_ID], color:[], spc:[], isNoAcc:false, isPrivate:false, isLease:false, isFixed:false,
   isAdminCheck:false, isOffPrice:false, itemCount:30, zid:"116", order:"modify",
 };
-const BACKUP_CARS_URL = "data/cars.json?v=20261018-1";
+const BACKUP_CARS_URL = "data/cars.json?v=20261108-1";
 const fuelName = (code) => ({ 0:"알 수 없음", 1:"가솔린", 2:"디젤", 3:"LPG", 4:"가솔린/LPG", 5:"CNG", 6:"하이브리드", 7:"전기/LPG", 8:"가솔린/CNG", 9:"전기", 10:"수소", 11:"전기/디젤" })[code] || "기타";
 const transmissionName = (code) => ({ 0:"알 수 없음", 1:"오토", 2:"수동", 3:"세미오토", 4:"CVT" })[code] || "기타";
 let vehicleSearchTimer;
@@ -218,7 +218,13 @@ function render(cars) {
     node.querySelector(".car-name").textContent = [car.model, car.trim].filter(Boolean).join(" ");
     node.querySelector(".car-spec").textContent = `${car.year || "-"}년 · ${fmt(car.mileage)}km · ${car.fuel || "-"}`;
     node.querySelector(".car-price").innerHTML = `${fmt(car.price)}<small>만원</small>`;
-    node.querySelector(".card-open").addEventListener("click", () => openDetail(car));
+    const openButton = node.querySelector(".card-open");
+    openButton.href = `cars/${encodeURIComponent(car.id)}.html`;
+    openButton.addEventListener("click", (event) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+      event.preventDefault();
+      openDetail(car);
+    });
     grid.append(node);
   });
 }
@@ -253,10 +259,7 @@ function renderDetail(car, loading = false) {
 }
 
 function carUrl(car) {
-  const url = new URL(window.location.href);
-  url.searchParams.set("car", car.id);
-  url.hash = "";
-  return url.toString();
+  return new URL(`cars/${encodeURIComponent(car.id)}.html`, window.location.origin).toString();
 }
 
 function setCarUrl(car) {

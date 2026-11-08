@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { generateSeoPages } from "./generate-seo-pages.mjs";
 
 const API_ROOT = "https://encode.moldeoncar.com/api";
 const API_KEY = process.env.INVENTORY_API_KEY || "22227bbf-66ad-4196-aa43-e50056411aa5";
@@ -66,3 +67,4 @@ const payload = {
 await mkdir(dirname(outputPath), { recursive:true });
 await writeFile(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 console.log(`두드림모터스 전체 차량 ${cars.length}대를 ${outputPath}에 저장했습니다.`);
+await generateSeoPages(outputPath);
